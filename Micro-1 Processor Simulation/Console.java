@@ -60,6 +60,26 @@ public class Console {
 	}
 
 	/**
+	 * 
+	 * 
+	 * @param fName the name of a file containing hex numbers
+	 */
+	public void assemble(String fName) {
+		try {
+			File f = new File(fName);
+			Scanner scan = new Scanner(f);
+			int address = 0;
+			while (scan.hasNext()) {
+				memory.write(address++, scan.nextInt(16));
+			}
+			cpu.setPC(0);
+			scan.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	/**
 	 * Displays synopsis of all commands in the console window
 	 */
 	public void help() {
