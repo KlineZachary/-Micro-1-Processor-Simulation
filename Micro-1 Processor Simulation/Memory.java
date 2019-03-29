@@ -17,7 +17,7 @@ public class Memory {
 
     public void dump() {
         for (int i = 0; i < cap; i++) {
-            System.out.println("cell[" + Integer.toHexString(i) + "] = " + cell[i]);
+            System.out.println("cell[" + Integer.toHexString(i) + "] = " + Integer.toHexString(cell[i]));
         }
     }
 
