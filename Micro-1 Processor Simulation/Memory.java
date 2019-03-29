@@ -1,38 +1,32 @@
-public class Memory{
-    private int[] cell;
-    private int cap = 256;
+public class Memory {
+    private int cap;
+    private int[] cell = new int[cap];
 
-    //Do we need cap in initializer
-    public Memory(int[] cell){
-        this.cell = cell;
+    // Do we need cap in initializer
+    public Memory(int cap) {
+        this.cell = new int[this.cap = cap];
     }
 
-    public int read(int addr){
-        //Temporary so no error
-        return 0;
+    public int read(int addr) {
+        return cell[addr];
     }
 
-    public void write(int addr,int data){
-
+    public void write(int addr, int data) {
+        cell[addr] = data;
     }
 
-    public void dump(){
-
+    public void dump() {
+        for (int i = 0; i < cap; i++) {
+            System.out.println("cell[" + Integer.toHexString(i) + "] = " + cell[i]);
+        }
     }
 
-    public void setCell(int[] cell){
-        this.cell = cell;
-    }
-    public void setCap(int cap){
+    public void setCap(int cap) {
         this.cap = cap;
     }
-    public int[] getCell(){
-        return cell;
-    }
-    public int getCap(){
+
+    public int getCap() {
         return cap;
     }
-
-
 
 }
