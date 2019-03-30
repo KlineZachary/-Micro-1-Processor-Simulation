@@ -5,12 +5,11 @@ public class Processor {
                        // current instruction
     private Memory memory;
 
-    public boolean step() {// true = halt program
+    public boolean step() throws Exception {// true = halt program
         IR = memory.read(PC++);
-        if (IR == 0) {
+        if (IR == 0 || !execute()) {
             return true;
         }
-        execute();
         return false;
     }
 
@@ -22,7 +21,7 @@ public class Processor {
         System.out.println("IR = " + Integer.toHexString(IR));
     }
 
-    public void execute() {
+    public boolean execute() {
         int decoder = 15;// get token P, A, B
         int b = IR & decoder;// read first 4
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
@@ -48,8 +47,10 @@ public class Processor {
             memory.write(reg[a], reg[a] - reg[b]);
             break;
         case 7:// div
-            if (reg[b] == 0)
-                throw new Exception("Division Error: address " + b + " is zero.");
+            if (reg[b] == 0) {
+                System.out.println("Division Error: address " + b + " is zero.");
+                return false;
+            }
             memory.write(reg[a], reg[a] / reg[b]);
             break;
         case 8:// and
@@ -72,6 +73,7 @@ public class Processor {
         case 15:// if
             break;
         }
+        return true;
     }
 
     public void setMemory(Memory memory) {
