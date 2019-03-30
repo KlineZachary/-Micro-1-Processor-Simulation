@@ -5,7 +5,7 @@ public class Processor {
                        // current instruction
     private Memory memory;
 
-    public boolean step() throws Exception {// true = halt program
+    public boolean step() {// true = halt program
         IR = memory.read(PC++);
         if (IR == 0 || !execute()) {
             return true;
@@ -38,20 +38,21 @@ public class Processor {
             memory.write(reg[a], reg[b]);
             break;
         case 4:// add
-            memory.write(reg[a], reg[a] + reg[b]);
+            System.out.println("Saving ");
+            reg[a] += reg[b];
             break;
         case 5:// mul
-            memory.write(reg[a], reg[a] * reg[b]);
+            reg[a] *= reg[b];
             break;
         case 6:// sub
-            memory.write(reg[a], reg[a] - reg[b]);
+            reg[a] -= reg[b];
             break;
         case 7:// div
             if (reg[b] == 0) {
                 System.out.println("Division Error: address " + b + " is zero.");
                 return false;
             }
-            memory.write(reg[a], reg[a] / reg[b]);
+            reg[a] /= reg[b];
             break;
         case 8:// and
             reg[a] = (reg[a] != 0 && reg[b] != 0) ? 1 : 0;
