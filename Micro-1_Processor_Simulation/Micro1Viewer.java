@@ -121,10 +121,13 @@ public class Micro1Viewer {
             case 2:// Reset
                 break;
             case 3:// Step
+                console.step();
                 break;
             case 4:// Memory load
+                console.getCPU().dump();
                 break;
             case 5:// Memory dumps
+                console.getMemory().dump();
                 break;
             }
         }
