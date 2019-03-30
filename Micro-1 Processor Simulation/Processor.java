@@ -45,14 +45,21 @@ public class Processor {
             memory.write(reg[a], reg[a] * reg[b]);
             break;
         case 6:// sub
+            memory.write(reg[a], reg[a] - reg[b]);
             break;
         case 7:// div
+            if (reg[b] == 0)
+                throw new Exception("Division Error: address " + b + " is zero.");
+            memory.write(reg[a], reg[a] / reg[b]);
             break;
         case 8:// and
+            reg[a] = (reg[a] != 0 && reg[b] != 0) ? 1 : 0;
             break;
         case 9:// or
+            reg[a] = (reg[a] != 0 || reg[b] != 0) ? 1 : 0;
             break;
         case 10:// not
+            reg[a] = (reg[b] != 0) ? 0 : 1;
             break;
         case 11:// lshift
             break;
