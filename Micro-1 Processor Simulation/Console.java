@@ -62,15 +62,19 @@ public class Console {
 	/**
 	 * 
 	 * 
-	 * @param fName the name of a file containing hex numbers
+	 * @param fName the name of a file containing assembly code
 	 */
 	public void assemble(String fName) {
 		try {
 			File f = new File(fName);
 			Scanner scan = new Scanner(f);
+			Assembler assembler = new Assembler();
 			int address = 0;
 			while (scan.hasNext()) {
-				memory.write(address++, scan.nextInt(16));
+				String instr = scan.next();
+				int a = instr.matches("halt") ? 0 : scan.nextInt(16);
+				int b = instr.matches("halt|loadc") ? 0 : scan.nextInt(16);
+				memory.write(address++, assembler.translate(instr, a, b));
 			}
 			cpu.setPC(0);
 			scan.close();
@@ -84,6 +88,7 @@ public class Console {
 	 */
 	public void help() {
 		System.out.println("load fileName \t loads hex memory image into memory");
+		System.out.println("assemble fileName \t loads assembly code into memory");
 		System.out.println("memory \t\t dumps memory to console");
 		System.out.println("registers \t dumps registers to console");
 		System.out.println("step N \t\t executes next N instructions or until halt");
@@ -110,6 +115,9 @@ public class Console {
 				help();
 			} else if (cmmd.equals("load")) {
 				load(kbd.next());
+				System.out.println("done");
+			} else if (cmmd.equals("assemble")) {
+				assemble(kbd.next());
 				System.out.println("done");
 			} else if (cmmd.equals("memory")) {
 				memory.dump();

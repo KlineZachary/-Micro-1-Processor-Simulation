@@ -12,6 +12,6 @@ public class Assembler {
                 return Integer.parseInt(Integer.toHexString(i) + Integer.toHexString(a) + Integer.toHexString(b), 16);
             }
         }
-        return 0;
+        return -1;// error
     }
 }
