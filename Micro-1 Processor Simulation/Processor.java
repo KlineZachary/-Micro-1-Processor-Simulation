@@ -39,8 +39,10 @@ public class Processor {
             memory.write(reg[a], reg[b]);
             break;
         case 4:// add
+            memory.write(reg[a], reg[a] + reg[b]);
             break;
         case 5:// mul
+            memory.write(reg[a], reg[a] * reg[b]);
             break;
         case 6:// sub
             break;
