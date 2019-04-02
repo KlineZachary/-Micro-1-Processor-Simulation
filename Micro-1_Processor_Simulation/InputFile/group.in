@@ -1,0 +1,6 @@
+quit
+load MyStuff/group.txt
+step 14
+memory
+registers
+quit

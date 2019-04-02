@@ -1,0 +1,6 @@
+quit
+load KevinStuff/zhu.txt
+step 24
+memory
+registers
+quit
