@@ -68,10 +68,13 @@ public class Processor {
             reg[a] = (reg[b] != 0) ? 0 : 1;
             break;
         case 11:// lshift
+            reg[a] = reg[b] << 1;
             break;
         case 12:// rshift
+            reg[a] = reg[b] >> 1;
             break;
         case 13:// bwc
+
             break;
         case 14:// bwd
             break;
