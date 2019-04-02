@@ -64,6 +64,8 @@ public class Console {
 	 * 
 	 * @param fName the name of a file containing assembly code
 	 */
+	// Kevin==============================================
+
 	public void assemble(String fName) {
 		try {
 			File f = new File(fName);
@@ -86,6 +88,7 @@ public class Console {
 			System.out.println(e);
 		}
 	}
+	// ==============================================
 
 	/**
 	 * Displays synopsis of all commands in the console window

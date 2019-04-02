@@ -6,22 +6,27 @@ public class Processor {
     private Memory memory;
 
     public boolean step() {// true = halt program
+        // Kevin==============================================
         IR = memory.read(PC++);
         if (IR == 0 || !execute()) {
             return true;
         }
         return false;
+        // ==============================================
     }
 
     public void dump() {// show all registers
+        // Kevin==============================================
         for (int i = 0; i < 8; i++) {
             System.out.println("reg[" + Integer.toHexString(i) + "] = " + Integer.toHexString(reg[i]));
         }
         System.out.println("PC = " + Integer.toHexString(PC));
         System.out.println("IR = " + Integer.toHexString(IR));
+        // ==============================================
     }
 
     public boolean execute() {
+        // Kevin==============================================
         int decoder = 15;// get token P, A, B
         int b = IR & decoder;// read first 4
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
@@ -36,6 +41,7 @@ public class Processor {
         case 3:
             memory.write(reg[a], reg[b]);
             break;
+        // ==============================================
         case 4:// add
             reg[a] += reg[b];
             break;

@@ -12,11 +12,11 @@ public class Memory {
     }
 
     public void write(int addr, int data) {
-        cell[addr] = data;
+        cell[addr] = data;// Kevin
     }
 
     public void dump() {
-        for (int i = 0; i < cap; i++) {
+        for (int i = 0; i < cap; i++) {// Kevin
             System.out.println("cell[" + Integer.toHexString(i) + "] = " + Integer.toHexString(cell[i]));
         }
     }
