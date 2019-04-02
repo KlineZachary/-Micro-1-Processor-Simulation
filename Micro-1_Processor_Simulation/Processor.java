@@ -26,7 +26,6 @@ public class Processor {
         int b = IR & decoder;// read first 4
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
         int p = (IR & (decoder <<= 4)) >> 8;// read next 4
-        System.out.println("P: " + p + " A: " + a + " B: " + b);
         switch (p) {// command list + execution code
         case 1:
             reg[a] = memory.read(reg[b]);
@@ -38,7 +37,6 @@ public class Processor {
             memory.write(reg[a], reg[b]);
             break;
         case 4:// add
-            System.out.println("Saving ");
             reg[a] += reg[b];
             break;
         case 5:// mul

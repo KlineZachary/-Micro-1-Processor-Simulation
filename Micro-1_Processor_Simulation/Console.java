@@ -71,6 +71,10 @@ public class Console {
 			Assembler assembler = new Assembler();
 			int address = 0;
 			while (scan.hasNext()) {
+				if (scan.hasNextInt()) {
+					memory.write(address++, scan.nextInt(16));
+					continue;
+				}
 				String instr = scan.next();
 				int a = instr.matches("halt") ? 0 : scan.nextInt(16);
 				int b = instr.matches("halt|loadc") ? 0 : scan.nextInt(16);
@@ -88,12 +92,42 @@ public class Console {
 	 */
 	public void help() {
 		System.out.println("load fileName \t loads hex memory image into memory");
-		System.out.println("assemble fileName \t loads assembly code into memory");
+		System.out.println("asm fileName \t loads assembly code into memory");
 		System.out.println("memory \t\t dumps memory to console");
 		System.out.println("registers \t dumps registers to console");
 		System.out.println("step N \t\t executes next N instructions or until halt");
 		System.out.println("help \t\t displays this message");
 		System.out.println("quit \t\t terminate console");
+	}
+
+	public boolean step() {
+		int num;
+		if (!kbd.hasNextInt()) {
+			num = 0;
+			kbd.nextLine();
+			System.out.println("invalid number of steps");
+		} else {
+			num = kbd.nextInt();
+			boolean halt = false;
+			for (int i = 0; i < num && !halt; i++) {
+				if (!halt)
+					halt = cpu.step();
+				if (halt) {
+					System.out.println("program terminated");
+					return false;
+				}
+			}
+			System.out.println("done");
+		}
+		return true;
+	}
+
+	public Processor getCPU() {
+		return cpu;
+	}
+
+	public Memory getMemory() {
+		return memory;
 	}
 
 	/**
@@ -116,7 +150,7 @@ public class Console {
 			} else if (cmmd.equals("load")) {
 				load(kbd.next());
 				System.out.println("done");
-			} else if (cmmd.equals("assemble")) {
+			} else if (cmmd.equals("asm")) {
 				assemble(kbd.next());
 				System.out.println("done");
 			} else if (cmmd.equals("memory")) {
@@ -124,23 +158,8 @@ public class Console {
 			} else if (cmmd.equals("registers")) {
 				cpu.dump();
 			} else if (cmmd.equals("step")) {
-				int num;
-				if (!kbd.hasNextInt()) {
-					num = 0;
-					kbd.nextLine();
-					System.out.println("invalid number of steps");
-				} else {
-					num = kbd.nextInt();
-					boolean halt = false;
-					for (int i = 0; i < num && !halt; i++) {
-						if (!halt)
-							halt = cpu.step();
-						if (halt) {
-							System.out.println("program terminated");
-							break;
-						}
-					}
-					System.out.println("done");
+				if (!step()) {
+					break;
 				}
 			} else {
 				System.out.println("unrecognized command: " + cmmd);
