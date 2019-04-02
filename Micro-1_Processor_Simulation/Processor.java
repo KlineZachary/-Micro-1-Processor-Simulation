@@ -48,6 +48,7 @@ public class Processor {
         case 5:// mul
             reg[a] *= reg[b];
             break;
+         //Zach==============================================
         case 6:// sub
             reg[a] -= reg[b];
             break;
@@ -67,6 +68,7 @@ public class Processor {
         case 10:// not
             reg[a] = (reg[b] != 0) ? 0 : 1;
             break;
+        //==============================================
         case 11:// lshift
             reg[a] = reg[b] << 1;
             break;
@@ -84,6 +86,7 @@ public class Processor {
         return true;
     }
 
+    //Zach==============================================
     public void setMemory(Memory memory) {
         this.memory = memory;
     }
@@ -115,5 +118,6 @@ public class Processor {
     public Memory getMemory() {
         return memory;
     }
+    //==============================================
 
 }
