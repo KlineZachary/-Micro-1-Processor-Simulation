@@ -42,13 +42,15 @@ public class Processor {
             memory.write(reg[a], reg[b]);
             break;
         // ==============================================
+        // Christopher =====================================
         case 4:// add
             reg[a] += reg[b];
             break;
         case 5:// mul
             reg[a] *= reg[b];
             break;
-         //Zach==============================================
+        // ===================================================
+        // Zach==============================================
         case 6:// sub
             reg[a] -= reg[b];
             break;
@@ -68,7 +70,7 @@ public class Processor {
         case 10:// not
             reg[a] = (reg[b] != 0) ? 0 : 1;
             break;
-        //==============================================
+        // ==============================================
         case 11:// lshift
             // Christopher ==============================================================
             reg[a] = reg[b] << 1;
@@ -91,7 +93,7 @@ public class Processor {
         return true;
     }
 
-    //Zach==============================================
+    // Zach==============================================
     public void setMemory(Memory memory) {
         this.memory = memory;
     }
@@ -123,6 +125,6 @@ public class Processor {
     public Memory getMemory() {
         return memory;
     }
-    //==============================================
+    // ==============================================
 
 }
