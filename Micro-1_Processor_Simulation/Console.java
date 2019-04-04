@@ -170,7 +170,7 @@ public class Console {
 					kbd.nextLine();
 			}
 		}
-		System.out.println("Bye! Drink tea, take a warm shower, don't stress, and get a " + "good night's sleep.");
+		System.out.println("Bye! Drink tea, take a warm shower, don't stress, and get a good night's sleep.");
 	}
 
 	/**
