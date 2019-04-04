@@ -1,5 +1,5 @@
 quit
-load KevinStuff/zhu.txt
+load InputFile/zhu.txt
 step 24
 memory
 registers

@@ -1,5 +1,5 @@
 quit
-asm MyStuff/zhu2.txt
+asm InputFile/zhu2.txt
 step 6
 memory
 registers

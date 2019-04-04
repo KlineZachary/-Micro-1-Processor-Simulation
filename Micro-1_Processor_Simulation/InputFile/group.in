@@ -1,5 +1,5 @@
 quit
-load MyStuff/group.txt
+load InputFile/group.txt
 step 14
 memory
 registers
