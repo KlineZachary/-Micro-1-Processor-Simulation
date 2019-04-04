@@ -18,9 +18,12 @@ public class MyCompiler {
 
     public String evaluate(String expression) {
         StringBuilder out = new StringBuilder();
+        index = 0;
         if (expression.contains("=")) {
             String[] expressions = expression.split("=");
             Queue<String> post = postFix(expressions[1]);
+            if (post == null)
+                return null;
             Stack<String> nums = new Stack<>();
             boolean loadFirst = false;
             while (!post.isEmpty()) {
@@ -63,7 +66,6 @@ public class MyCompiler {
     public Queue<String> postFix(String expression) {
         Queue<String> out = new LinkedList<>();
         Stack<String> operators = new Stack<>();
-        index = 0;
         while (index < expression.length()) {
             String token = nextToken(expression);
             if (token.matches("[a-zA-Z0-9]+")) {
@@ -92,8 +94,10 @@ public class MyCompiler {
             }
         }
         while (!operators.isEmpty()) {
-            if (operators.peek().equals("("))
+            if (operators.peek().equals("(")) {
+                System.out.println("Operator at end has (");
                 return null;
+            }
             out.add(operators.pop());
 
         }
@@ -122,13 +126,13 @@ public class MyCompiler {
     public String command(String op) {
         switch (op) {
         case "+":
-            return "add ";
+            return "add";
         case "-":
             return "sub";
         case "*":
-            return "mul ";
+            return "mul";
         case "/":
-            return "div ";
+            return "div";
         case "^":
             return "";
         default:
@@ -137,15 +141,13 @@ public class MyCompiler {
     }
 
     public String nextToken(String expression) {
+        if (!Character.isLetterOrDigit(expression.charAt(index)))
+            return expression.substring(index, ++index);
         int startIndex = index;
-        char first = expression.charAt(index++);
-        if (!Character.isLetterOrDigit(first))
-            return "" + first;
-        while (index < expression.length() && Character.isLetterOrDigit(expression.charAt(index++))) {
+        while (index < expression.length() && Character.isLetterOrDigit(expression.charAt(index))) {
+            index++;
         }
-        if (index < expression.length()) {
-            index--;
-        }
+
         return expression.substring(startIndex, index);
     }
 
@@ -162,6 +164,6 @@ public class MyCompiler {
         compile.variables.put("x", 15);
         compile.variables.put("y", 255);
 
-        System.out.println(compile.evaluate("x=7+3*5"));
+        System.out.println(compile.evaluate("x=((10+5)*7)"));
     }
 }

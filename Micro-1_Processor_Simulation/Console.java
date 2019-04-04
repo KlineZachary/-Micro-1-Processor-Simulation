@@ -112,7 +112,13 @@ public class Console {
 						compiler.insertVariable(var, --stackPointer);
 					}
 				}
-				b.append(compiler.evaluate(line));
+				System.out.println("Evaluating: " + line);
+				String assembly = compiler.evaluate(line);
+				if (assembly != null) {
+					b.append(assembly);
+				} else {
+					System.out.println("Error at line: " + line);
+				}
 				// b.append("halt");
 			}
 			System.out.println("Compiled successfully");
