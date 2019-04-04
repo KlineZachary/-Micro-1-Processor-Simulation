@@ -157,8 +157,11 @@ public class Console {
 			num = kbd.nextInt();
 			boolean halt = false;
 			for (int i = 0; i < num && !halt; i++) {
-				if (!halt)
+				if (!halt){
 					halt = cpu.step();
+				}
+				
+					
 				if (halt) {
 					System.out.println("program terminated");
 					return false;

@@ -5,13 +5,17 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
+import java.util.Scanner;
+import java.util.ArrayList;
 public class Micro1Viewer {
 
     static Console console = new Console();
 
+
+
     public static void main(String[] args) {
         Micro1Viewer viewer = new Micro1Viewer();
+        
     }
 
     public Micro1Viewer() {
@@ -34,7 +38,7 @@ public class Micro1Viewer {
         f.add(scrollPane);
 
         DisplayRegister.loadDimensions(width, height);
-        DisplayRegister.addAll(f, 8);
+        DisplayRegister.addAll(f,8);
 
         f.setSize(width, height);
         f.setLayout(null);// using no layout managers
@@ -82,26 +86,42 @@ public class Micro1Viewer {
 
     }
 
-    static class DisplayRegister {
+    static class DisplayRegister {        
         static int x, y = Button.y + Button.length, width, height = 30, dy, index;
-
+        static ArrayList<JTextField> textFieldList = new ArrayList<JTextField>();
+        
         public static void loadDimensions(int w, int h) {
             x = w / 2 + 75;
             width = w / 8;
             dy = height + 15;
         }
 
+       
+
         public static void addAll(JFrame f, int count) {
+            
             for (int i = 0; i < count; i++) {
                 JLabel label = new JLabel("Register " + i);
                 label.setBounds(x, y, 500, height);
                 f.add(label);
-                JTextField text = new JTextField("0");
-                text.setBounds(x + 75, y, width, height);
-                f.add(text);
+                JTextField textField = new JTextField(Integer.toHexString(console.getCPU().getReg()[i]));
+                textFieldList.add(textField);
+                textField.setEditable(false); // Registers are for display only
+                textField.setBounds(x + 75, y, width, height);
+                f.add(textField);
                 y += dy;
             }
         }
+
+        public static void updateRegisters(){
+            String[] regNumbers = console.getCPU().guiDump();
+            for(int i = 0; i < textFieldList.size(); i++){
+                int[] regArray = new int[console.getCPU().getReg().length];
+                textFieldList.get(i).setText(regNumbers[i]);
+                System.out.println(regNumbers[i]);
+            }
+        }
+
 
     }
 
@@ -120,8 +140,12 @@ public class Micro1Viewer {
                 break;
             case 2:// Reset
                 break;
+
+            //Zach
             case 3:// Step
-                console.step();
+                createInputDialog();
+                DisplayRegister.updateRegisters();
+                JOptionPane.showMessageDialog(null,"Program Terminated");
                 break;
             case 4:// Memory load
                 console.getCPU().dump();
@@ -132,4 +156,37 @@ public class Micro1Viewer {
             }
         }
     }
+    
+    //Zach ====================
+    /**
+     * Create Input dialog for num of steps
+     * Then call step method with number that was inputed
+     * 
+     */
+    public static void createInputDialog(){
+        String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
+        int numSteps = Integer.parseInt(userInput);
+        if (!step(numSteps)) ; //break
+    }
+
+    /**
+     * Step through and tell user when program is terminated
+     */
+
+    public static boolean step(int numSteps) {
+		boolean halt = false;
+		for (int i = 0; i < numSteps && !halt; i++) {
+			if (!halt) halt = console.getCPU().step();
+        
+			if (halt) {
+                System.out.println("program terminated");
+				return false;
+			}
+		}
+		System.out.println("done");
+		return true;
+    }
+ 
+    //===========================================
 }
+

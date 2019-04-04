@@ -17,9 +17,7 @@ public class Processor {
 
     public void dump() {// show all registers
         // Kevin==============================================
-        for (int i = 0; i < 8; i++) {
-            System.out.println("reg[" + Integer.toHexString(i) + "] = " + Integer.toHexString(reg[i]));
-        }
+        
         System.out.println("PC = " + Integer.toHexString(PC));
         System.out.println("IR = " + Integer.toHexString(IR));
         // ==============================================
@@ -92,6 +90,15 @@ public class Processor {
         // ==============================================================
         }
         return true;
+    }
+
+    public String[] guiDump(){
+        String[] regNumbers = new String[reg.length];
+        for (int i = 0; i < 8; i++) {
+            regNumbers[i] = Integer.toHexString(reg[i]);
+        }
+        return regNumbers;
+
     }
 
     // Zach==============================================

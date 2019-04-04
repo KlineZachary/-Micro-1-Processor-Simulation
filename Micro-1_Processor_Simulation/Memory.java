@@ -3,12 +3,12 @@ public class Memory {
     private int[] cell = new int[cap];
 
     // Do we need cap in initializer
-    public Memory(int cap) {
+    public Memory(int cap) { //  Zach I think
         this.cell = new int[this.cap = cap];
     }
 
     public int read(int addr) {
-        return cell[addr];
+        return cell[addr]; // Zach
     }
 
     public void write(int addr, int data) {
@@ -22,11 +22,11 @@ public class Memory {
     }
 
     public void setCap(int cap) {
-        this.cap = cap;
+        this.cap = cap; //Zach 
     }
 
     public int getCap() {
-        return cap;
+        return cap; // Zach 
     }
 
 }
