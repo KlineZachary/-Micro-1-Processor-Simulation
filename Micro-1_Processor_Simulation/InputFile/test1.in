@@ -1,4 +1,5 @@
-asm MyStuff/test1.txt
+quit
+asm InputFile/test1.txt
 step 2
 registers
 quit

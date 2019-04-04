@@ -73,17 +73,54 @@ public class Console {
 			Assembler assembler = new Assembler();
 			int address = 0;
 			while (scan.hasNext()) {
-				if (scan.hasNextInt()) {
+				String instr = scan.next();
+				if (instr.matches("[0-9a-f]") && !instr.equals("add")) {
 					memory.write(address++, scan.nextInt(16));
 					continue;
 				}
-				String instr = scan.next();
 				int a = instr.matches("halt") ? 0 : scan.nextInt(16);
 				int b = instr.matches("halt|loadc") ? 0 : scan.nextInt(16);
+				System.out.println(address + ". " + instr + " " + a + " " + b);
 				memory.write(address++, assembler.translate(instr, a, b));
 			}
 			cpu.setPC(0);
 			scan.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	public void compile(String fName) {
+		try {
+			File f = new File(fName);
+			Scanner scan = new Scanner(f);
+			MyCompiler compiler = new MyCompiler();
+			StringBuilder b = new StringBuilder();
+			while (scan.hasNext()) {
+				b.append(scan.nextLine());
+			}
+			scan.close();
+
+			String[] lines = b.toString().replace("\\w", "").split(";");
+
+			b = new StringBuilder();
+			int stackPointer = memory.getCap();
+			for (String line : lines) {
+				if (line.contains("=")) {
+					String var = line.split("=")[0];
+					if (!compiler.containsVariable(var)) {
+						compiler.insertVariable(var, --stackPointer);
+					}
+				}
+				b.append(compiler.evaluate(line));
+				// b.append("halt");
+			}
+			System.out.println("Compiled successfully");
+			String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm2";
+			PrintWriter writer = new PrintWriter(asmName);
+			writer.println(b.toString());
+			writer.close();
+			assemble(asmName);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -96,6 +133,7 @@ public class Console {
 	public void help() {
 		System.out.println("load fileName \t loads hex memory image into memory");
 		System.out.println("asm fileName \t loads assembly code into memory");
+		System.out.println("cmp fileName \t compiles high level code to assembly and then to memory");
 		System.out.println("memory \t\t dumps memory to console");
 		System.out.println("registers \t dumps registers to console");
 		System.out.println("step N \t\t executes next N instructions or until halt");
@@ -156,13 +194,16 @@ public class Console {
 			} else if (cmmd.equals("asm")) {
 				assemble(kbd.next());
 				System.out.println("done");
+			} else if (cmmd.equals("cmp")) {
+				compile(kbd.next());
+				System.out.println("done");
 			} else if (cmmd.equals("memory")) {
 				memory.dump();
 			} else if (cmmd.equals("registers")) {
 				cpu.dump();
 			} else if (cmmd.equals("step")) {
 				if (!step()) {
-					break;
+					// break;
 				}
 			} else {
 				System.out.println("unrecognized command: " + cmmd);
