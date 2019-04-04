@@ -74,13 +74,13 @@ public class Console {
 			int address = 0;
 			while (scan.hasNext()) {
 				String instr = scan.next();
-				if (instr.matches("[0-9a-f]") && !instr.equals("add")) {
-					memory.write(address++, scan.nextInt(16));
+				if (instr.matches("[0-9a-f]+") && !instr.equals("add")) {
+					memory.write(address++, Integer.parseInt(instr, 16));
 					continue;
 				}
 				int a = instr.matches("halt") ? 0 : scan.nextInt(16);
 				int b = instr.matches("halt|loadc") ? 0 : scan.nextInt(16);
-				System.out.println(address + ". " + instr + " " + a + " " + b);
+				// System.out.println(address + ". " + instr + " " + a + " " + b);
 				memory.write(address++, assembler.translate(instr, a, b));
 			}
 			cpu.setPC(0);
