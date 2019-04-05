@@ -17,7 +17,7 @@ public class Processor {
 
     public void dump() {// show all registers
         // Kevin==============================================
-        
+
         System.out.println("PC = " + Integer.toHexString(PC));
         System.out.println("IR = " + Integer.toHexString(IR));
         // ==============================================
@@ -29,7 +29,7 @@ public class Processor {
         int b = IR & decoder;// read first 4
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
         int p = (IR & (decoder <<= 4)) >> 8;// read next 4
-        // System.out.println(p + " " + a + " " + b);
+        // System.out.println("ML: " + p + " " + a + " " + b);
         switch (p) {// command list + execution code
         case 1:
             reg[a] = memory.read(reg[b]);
@@ -92,7 +92,7 @@ public class Processor {
         return true;
     }
 
-    public String[] guiDump(){
+    public String[] guiDump() {
         String[] regNumbers = new String[reg.length];
         for (int i = 0; i < 8; i++) {
             regNumbers[i] = Integer.toHexString(reg[i]);

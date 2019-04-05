@@ -19,6 +19,10 @@ public class Console {
 	 */
 	private Processor cpu;
 
+	private Assembler assembler;
+
+	private MyCompiler compiler;
+
 	/**
 	 * Constructs a memory with specified number of cells, and constructs an
 	 * associated processor.
@@ -67,59 +71,89 @@ public class Console {
 	// Kevin==============================================
 
 	public void assemble(String fName) {
+		String current = "";
 		try {
 			File f = new File(fName);
 			Scanner scan = new Scanner(f);
-			Assembler assembler = new Assembler();
+			assembler = new Assembler();
 			int address = 0;
-			while (scan.hasNext()) {
-				String instr = scan.next();
+			ArrayList<String> tokens = new ArrayList<String>();
+			for (int lineNum = 0; scan.hasNext(); lineNum++) {
+				String token = current = scan.next();
+				if (token.startsWith(":label")) {
+					assembler.insertLabel(Integer.parseInt(token.substring(2), 16), lineNum--);
+
+				} else {
+					tokens.add(token);
+
+					if (token.startsWith(":go")) {
+						continue;
+					}
+					if (token.matches("[0-9a-f]+") && !token.equals("add")) {
+						continue;
+					}
+					if (!token.equals("halt"))
+						tokens.add(scan.next());
+					if (!token.matches("halt|loadc"))
+						tokens.add(scan.next());
+				}
+
+			}
+			for (int i = 0; i < tokens.size();) {
+				String instr = current = tokens.get(i++);
+				if (instr.startsWith(":go")) {
+					memory.write(address++, assembler.getLine(Integer.parseInt(instr.substring(2), 16)));
+					continue;
+				}
 				if (instr.matches("[0-9a-f]+") && !instr.equals("add")) {
 					memory.write(address++, Integer.parseInt(instr, 16));
 					continue;
 				}
-				int a = instr.matches("halt") ? 0 : scan.nextInt(16);
-				int b = instr.matches("halt|loadc") ? 0 : scan.nextInt(16);
+				int a = instr.equals("halt") ? 0 : Integer.parseInt(tokens.get(i++));
+				int b = instr.matches("halt|loadc") ? 0 : Integer.parseInt(tokens.get(i++));
+				current = instr + " " + Integer.toHexString(a) + " " + Integer.toHexString(b);
 				// System.out.println(address + ". " + instr + " " + a + " " + b);
 				memory.write(address++, assembler.translate(instr, a, b));
 			}
 			cpu.setPC(0);
 			scan.close();
+			System.out.println("Assembled successfully");
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("ASM Error: " + e.getMessage() + " with line '" + current + "'");
 		}
 	}
 
 	public void compile(String fName) {
+		int lineNumber = 0;
+		String line = "";
 		try {
 			File f = new File(fName);
 			Scanner scan = new Scanner(f);
-			MyCompiler compiler = new MyCompiler();
 			StringBuilder b = new StringBuilder();
+			compiler = new MyCompiler();
 			while (scan.hasNext()) {
 				b.append(scan.nextLine());
 			}
 			scan.close();
 
-			String[] lines = b.toString().replace("\\w", "").split(";");
+			String[] lines = b.toString().replace("\\w", "").replace("true", "1").replace("false", "0").split(";");
 
 			b = new StringBuilder();
 			int stackPointer = memory.getCap();
-			for (String line : lines) {
+			while (lineNumber < lines.length) {
+				line = lines[lineNumber];
 				if (line.contains("=")) {
 					String var = line.split("=")[0];
 					if (!compiler.containsVariable(var)) {
 						compiler.insertVariable(var, --stackPointer);
 					}
 				}
-				System.out.println("Evaluating: " + line);
-				String assembly = compiler.evaluate(line);
-				if (assembly != null) {
-					b.append(assembly);
-				} else {
-					System.out.println("Error at line: " + line);
+				String evaluated = compiler.evaluate(line);
+				if (evaluated != null) {
+					b.append(evaluated);
+					// b.append("halt");
 				}
-				// b.append("halt");
+				lineNumber++;
 			}
 			System.out.println("Compiled successfully");
 			String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm2";
@@ -128,7 +162,29 @@ public class Console {
 			writer.close();
 			assemble(asmName);
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
+		}
+	}
+
+	public void print(String var) {
+		if (compiler == null) {
+			System.out.println("No file was compiled");
+		} else if (compiler.containsVariable(var)) {
+			System.out.println(var + "=" + memory.read(compiler.getVariable(var)));
+		} else {
+			System.out.println("Variable does not exist");
+		}
+	}
+
+	public void printAll() {
+		if (compiler == null) {
+			System.out.println("No file was compiled");
+		} else {
+			Iterator<String> vars = compiler.getAllVariables().iterator();
+			while (vars.hasNext()) {
+				String var = vars.next();
+				System.out.println(var + "=" + memory.read(compiler.getVariable(var)));
+			}
 		}
 	}
 	// ==============================================
@@ -143,6 +199,8 @@ public class Console {
 		System.out.println("memory \t\t dumps memory to console");
 		System.out.println("registers \t dumps registers to console");
 		System.out.println("step N \t\t executes next N instructions or until halt");
+		System.out.println("print \t\t displays a compiled variable");
+		System.out.println("printAll \t\t displays all compiled variables");
 		System.out.println("help \t\t displays this message");
 		System.out.println("quit \t\t terminate console");
 	}
@@ -157,11 +215,10 @@ public class Console {
 			num = kbd.nextInt();
 			boolean halt = false;
 			for (int i = 0; i < num && !halt; i++) {
-				if (!halt){
+				if (!halt) {
 					halt = cpu.step();
 				}
-				
-					
+
 				if (halt) {
 					System.out.println("program terminated");
 					return false;
@@ -214,6 +271,10 @@ public class Console {
 				if (!step()) {
 					// break;
 				}
+			} else if (cmmd.equals("print")) {
+				print(kbd.next());
+			} else if (cmmd.equals("printAll")) {
+				printAll();
 			} else {
 				System.out.println("unrecognized command: " + cmmd);
 				if (kbd.hasNext())
