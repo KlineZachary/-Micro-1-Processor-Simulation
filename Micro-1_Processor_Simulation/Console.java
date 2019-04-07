@@ -130,7 +130,7 @@ public class Console {
 			File f = new File(fName);
 			Scanner scan = new Scanner(f);
 			StringBuilder b = new StringBuilder();
-			compiler = new MyCompiler();
+			compiler = new MyCompiler(memory.getCap());
 			while (scan.hasNext()) {
 				b.append(scan.nextLine());
 			}
@@ -139,19 +139,31 @@ public class Console {
 			String[] lines = b.toString().replace("\\w", "").replace("true", "1").replace("false", "0").split(";");
 
 			b = new StringBuilder();
-			int stackPointer = memory.getCap();
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
+				boolean isArrayDeclaration = false;
 				if (line.contains("=")) {
-					String var = line.split("=")[0];
+					String[] parts = line.split("=");
+					String var = parts[0].split("\\[")[0];
+					int size = 1;
+					if (line.matches(".*\\[\\].*")) {
+						if (!line.matches("[0-9a-zA-Z]+\\[\\]=[0-9]+")) {
+							throw new Exception("Invalid array declaration.");
+						}
+						isArrayDeclaration = true;
+						int arrLen = Integer.parseInt(parts[1]);
+						size = arrLen;
+					}
 					if (!compiler.containsVariable(var)) {
-						compiler.insertVariable(var, --stackPointer);
+						compiler.insertVariable(var, size);
 					}
 				}
-				String evaluated = compiler.evaluate(line);
-				if (evaluated != null) {
-					b.append(evaluated);
-					// b.append("halt");
+				if (!isArrayDeclaration) {
+					String evaluated = compiler.evaluate(line, 1, 0);
+					if (evaluated.length() > 0) {
+						b.append(evaluated);
+						// b.append("halt");
+					}
 				}
 				lineNumber++;
 			}
@@ -163,10 +175,11 @@ public class Console {
 			assemble(asmName);
 		} catch (Exception e) {
 			System.out.println("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
+			e.printStackTrace();
 		}
 	}
 
-	public void print(String var) {
+	public void print(String var) throws Exception {
 		if (compiler == null) {
 			System.out.println("No file was compiled");
 		} else if (compiler.containsVariable(var)) {
@@ -176,7 +189,19 @@ public class Console {
 		}
 	}
 
-	public void printAll() {
+	public void printArr(String var, int len) throws Exception {
+		if (compiler == null) {
+			System.out.println("No file was compiled");
+		} else if (compiler.containsVariable(var)) {
+			for (int i = 0; i < len; i++) {
+				System.out.println(var + "[" + i + "]=" + memory.read(compiler.getVariable(var) + i));
+			}
+		} else {
+			System.out.println("Variable does not exist");
+		}
+	}
+
+	public void printAll() throws Exception {
 		if (compiler == null) {
 			System.out.println("No file was compiled");
 		} else {
@@ -199,13 +224,14 @@ public class Console {
 		System.out.println("memory \t\t dumps memory to console");
 		System.out.println("registers \t dumps registers to console");
 		System.out.println("step N \t\t executes next N instructions or until halt");
-		System.out.println("print \t\t displays a compiled variable");
-		System.out.println("printAll \t\t displays all compiled variables");
+		System.out.println("out varName\t\t displays a compiled variable");
+		System.out.println("arr var size \t\t displays a compiled array");
+		System.out.println("allout \t\t displays all compiled variables");
 		System.out.println("help \t\t displays this message");
 		System.out.println("quit \t\t terminate console");
 	}
 
-	public boolean step() {
+	public boolean step() throws Exception {
 		int num;
 		if (!kbd.hasNextInt()) {
 			num = 0;
@@ -249,37 +275,49 @@ public class Console {
 	public void controlLoop() {
 		System.out.println("type \"help\" for commands");
 		while (true) {
-			System.out.print("-> ");
-			String cmmd = kbd.next();
-			if (cmmd.equals("quit")) {
-				break;
-			} else if (cmmd.equals("help")) {
-				help();
-			} else if (cmmd.equals("load")) {
-				load(kbd.next());
-				System.out.println("done");
-			} else if (cmmd.equals("asm")) {
-				assemble(kbd.next());
-				System.out.println("done");
-			} else if (cmmd.equals("cmp")) {
-				compile(kbd.next());
-				System.out.println("done");
-			} else if (cmmd.equals("memory")) {
-				memory.dump();
-			} else if (cmmd.equals("registers")) {
-				cpu.dump();
-			} else if (cmmd.equals("step")) {
-				if (!step()) {
-					// break;
+			try {
+				System.out.print("-> ");
+				String cmmd = kbd.next();
+				if (cmmd.equals("quit")) {
+					break;
+				} else if (cmmd.equals("help")) {
+					help();
+				} else if (cmmd.equals("load")) {
+					load(kbd.next());
+					System.out.println("done");
+				} else if (cmmd.equals("asm")) {
+					assemble(kbd.next());
+					System.out.println("done");
+				} else if (cmmd.equals("cmp")) {
+					compile(kbd.next());
+					System.out.println("done");
+				} else if (cmmd.equals("memory")) {
+					memory.dump();
+				} else if (cmmd.equals("registers")) {
+					cpu.dump();
+				} else if (cmmd.equals("step")) {
+					if (!step()) {
+						// break;
+					}
+				} else if (cmmd.equals("out")) {
+					print(kbd.next());
+				} else if (cmmd.equals("arr")) {
+					String var = kbd.next();
+					if (!kbd.hasNextInt()) {
+						System.out.println("not a valid length");
+						kbd.nextLine();
+					} else {
+						printArr(var, kbd.nextInt());
+					}
+				} else if (cmmd.equals("allout")) {
+					printAll();
+				} else {
+					System.out.println("unrecognized command: " + cmmd);
+					if (kbd.hasNext())
+						kbd.nextLine();
 				}
-			} else if (cmmd.equals("print")) {
-				print(kbd.next());
-			} else if (cmmd.equals("printAll")) {
-				printAll();
-			} else {
-				System.out.println("unrecognized command: " + cmmd);
-				if (kbd.hasNext())
-					kbd.nextLine();
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
 			}
 		}
 		System.out.println("Bye! Drink tea, take a warm shower, don't stress, and get a good night's sleep.");

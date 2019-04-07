@@ -5,7 +5,7 @@ public class Processor {
                        // current instruction
     private Memory memory;
 
-    public boolean step() {// true = halt program
+    public boolean step() throws Exception {// true = halt program
         // Kevin==============================================
         IR = memory.read(PC++);
         if (IR == 0 || !execute()) {
@@ -25,14 +25,14 @@ public class Processor {
         // ==============================================
     }
 
-    public boolean execute() {
+    public boolean execute() throws Exception {
         // Kevin==============================================
         int decoder = 15;// get token P, A, B
         int b = IR & decoder;// read first 4
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
         int p = (IR & (decoder <<= 4)) >> 8;// read next 4
         // System.out.println("ML: " + p + " " + a + " " + b);
-        boolean debug = false;
+        boolean debug = true;
         switch (p) {// command list + execution code
         case 1:
             if (debug)

@@ -7,11 +7,13 @@ public class Memory {
         this.cell = new int[this.cap = cap];
     }
 
-    public int read(int addr) {
+    public int read(int addr) throws Exception {
+        isValidAddress(addr);
         return cell[addr]; // Zach
     }
 
-    public void write(int addr, int data) {
+    public void write(int addr, int data) throws Exception {
+        isValidAddress(addr);
         cell[addr] = data;// Kevin
     }
 
@@ -27,6 +29,11 @@ public class Memory {
 
     public int getCap() {
         return cap; // Zach
+    }
+
+    public void isValidAddress(int addr) throws Exception {
+        if (addr < 0 || addr >= cap)
+            throw new Exception("Invalid memory access at " + addr);
     }
 
 }
