@@ -31,26 +31,33 @@ public class MyCompiler {
             return null;
         } else if (line.equals("while")) {
             isExpectingBool = true;
-            String out = ":label" + Integer.toHexString(jumpCount) + "\n";
+            String out = ":lb" + Integer.toHexString(jumpCount) + "\n";
             jumpStack.push(-1 * (jumpCount++));
             return out;
         } else if (line.equals("end")) {
             String out = "";
             int elseNum = jumpStack.pop();
-            int whileNum = jumpStack.pop();
-            if (whileNum > 0) {
-                jumpStack.push(whileNum);
-            } else {
-                out += "loadc 1\n1\nloadc 0\n:go" + Integer.toHexString(-whileNum) + "\nif 1 0\n";
+            if (!jumpStack.isEmpty()) {
+                int whileNum = jumpStack.pop();
+                if (whileNum > 0) {
+                    jumpStack.push(whileNum);
+                } else {
+                    out += "loadc 1\n1\nloadc 0\n:go" + Integer.toHexString(-whileNum) + "\nif 1 0\n";
+                    System.out.println(":go" + Integer.toHexString(-whileNum));
+
+                }
             }
-            out += ":label" + Integer.toHexString(elseNum) + "\n";
+            out += ":lb" + Integer.toHexString(elseNum) + "\n";
             return out;
         }
         StringBuilder out = new StringBuilder();
 
         String expression;
 
-        if (line.matches("[^=]*=[^=]*")) {
+        if (line.matches(".*=.*")) {
+            if (line.matches("(.*=){2}.*")) {
+                throw new Exception("Two Equal Signs in one Statement");
+            }
 
             String[] parts = line.split("=");
             if (parts.length == 1) {
@@ -66,7 +73,6 @@ public class MyCompiler {
             throw new Exception("Invalid Expression");
         }
         out.append(handleExpression(expression));
-
         if (line.contains("=")) {
             String var = line.split("=")[0];
             out.append("loadc 0\n" + Integer.toHexString(variables.get(var)) + "\nstore 0 1\n");
@@ -84,21 +90,21 @@ public class MyCompiler {
     public String handleExpression(String expression) throws Exception {
         StringBuilder out = new StringBuilder();
         index = 0;
-        Queue<String> post = postFix(expression);
+        Queue<String> q = postFix(expression);
         Stack<String> nums = new Stack<>();
         boolean loadFirst = false;
-        while (!post.isEmpty()) {
-            String token = post.poll();
+        while (!q.isEmpty()) {
+            String token = q.poll();
             // System.out.println("Token: " + token);
             if (token.matches("[a-zA-Z0-9]+")) {
                 nums.add(token);
             } else {
                 if (!loadFirst) {
-                    out.append(load(nums.pop(), 1));
+                    out.append(load(nums.pop(), 0));
                     loadFirst = true;
                 }
-
-                out.append(load(nums.isEmpty() ? "0" : nums.pop(), 0));
+                out.append(load(nums.pop(), 1));
+                // out.append(load(nums.isEmpty() ? "0" : nums.pop(), 0));
                 out.append(getOperator(token));
                 out.append(" 1 0\n");
             }
@@ -182,8 +188,9 @@ public class MyCompiler {
     public String getOperator(String op) {
         switch (op) {
         case "+":
-        case "-":
             return "add";
+        case "-":
+            return "sub";
         case "*":
             return "mul";
         case "/":

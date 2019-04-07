@@ -17,7 +17,9 @@ public class Processor {
 
     public void dump() {// show all registers
         // Kevin==============================================
-
+        for (int i = 0; i < reg.length; i++) {
+            System.out.println("reg[" + Integer.toString(i) + "] = " + Integer.toHexString(reg[i]));
+        }
         System.out.println("PC = " + Integer.toHexString(PC));
         System.out.println("IR = " + Integer.toHexString(IR));
         // ==============================================
@@ -30,27 +32,45 @@ public class Processor {
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
         int p = (IR & (decoder <<= 4)) >> 8;// read next 4
         // System.out.println("ML: " + p + " " + a + " " + b);
+        boolean debug = false;
         switch (p) {// command list + execution code
         case 1:
+            if (debug)
+                System.out.print("REG[" + a + "] = MEM[" + reg[b] + "] = ");
             reg[a] = memory.read(reg[b]);
+            if (debug)
+                System.out.println(reg[a]);
             break;
         case 2:
             reg[a] = memory.read(PC++);
+            if (debug)
+                System.out.println("REG[" + a + "] = CONST " + reg[a]);
             break;
         case 3:
             memory.write(reg[a], reg[b]);
+            if (debug)
+                System.out.println("MEM[" + reg[a] + "] = REG[" + b + "] =" + reg[b]);
             break;
         // ==============================================
         // Christopher =====================================
         case 4:// add
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "+" + reg[b]);
+
             reg[a] += reg[b];
             break;
         case 5:// mul
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "x" + reg[b]);
+
             reg[a] *= reg[b];
             break;
         // ===================================================
         // Zach==============================================
         case 6:// sub
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "-" + reg[b]);
+
             reg[a] -= reg[b];
             break;
         case 7:// div
@@ -58,32 +78,60 @@ public class Processor {
                 System.out.println("Division Error: address " + b + " is zero.");
                 return false;
             }
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "/" + reg[b]);
+
             reg[a] /= reg[b];
             break;
         case 8:// and
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "&&" + reg[b]);
+
             reg[a] = (reg[a] != 0 && reg[b] != 0) ? 1 : 0;
             break;
         case 9:// or
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "||" + reg[b]);
+
             reg[a] = (reg[a] != 0 || reg[b] != 0) ? 1 : 0;
             break;
         case 10:// not
+            if (debug)
+                System.out.println("REG[" + a + "] = !" + reg[b]);
+
             reg[a] = (reg[b] != 0) ? 0 : 1;
             break;
         // ==============================================
         case 11:// lshift
             // Christopher ==============================================================
+            if (debug)
+                System.out.println("REG[" + a + "] = << " + reg[b]);
+
             reg[a] = reg[b] << 1;
+
             break;
         case 12:// rshift
+            if (debug)
+                System.out.println("REG[" + a + "] = >> " + reg[b]);
+
             reg[a] = reg[b] >> 1;
             break;
         case 13:// bwc
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "&" + reg[b]);
+
             reg[a] = reg[a] & reg[b];
             break;
         case 14:// bwd
+            if (debug)
+                System.out.println("REG[" + a + "] = " + reg[a] + "|" + reg[b]);
+
             reg[a] = reg[a] | reg[b];
             break;
         case 15:// if
+            if (debug && reg[a] != 0)
+                System.out.println("PC = REG[" + b + "] = " + reg[b]);
+
             if (reg[a] != 0)
                 PC = reg[b];
             break;

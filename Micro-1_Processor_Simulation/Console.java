@@ -80,8 +80,8 @@ public class Console {
 			ArrayList<String> tokens = new ArrayList<String>();
 			for (int lineNum = 0; scan.hasNext(); lineNum++) {
 				String token = current = scan.next();
-				if (token.startsWith(":label")) {
-					assembler.insertLabel(Integer.parseInt(token.substring(2), 16), lineNum--);
+				if (token.startsWith(":lb")) {
+					assembler.insertLabel(Integer.parseInt(token.substring(3), 16), lineNum--);
 
 				} else {
 					tokens.add(token);
@@ -102,7 +102,7 @@ public class Console {
 			for (int i = 0; i < tokens.size();) {
 				String instr = current = tokens.get(i++);
 				if (instr.startsWith(":go")) {
-					memory.write(address++, assembler.getLine(Integer.parseInt(instr.substring(2), 16)));
+					memory.write(address++, assembler.getLine(Integer.parseInt(instr.substring(3), 16)));
 					continue;
 				}
 				if (instr.matches("[0-9a-f]+") && !instr.equals("add")) {
@@ -215,6 +215,7 @@ public class Console {
 			num = kbd.nextInt();
 			boolean halt = false;
 			for (int i = 0; i < num && !halt; i++) {
+				// System.out.println("STEP: " + i + "/" + num);
 				if (!halt) {
 					halt = cpu.step();
 				}
