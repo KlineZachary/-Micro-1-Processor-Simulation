@@ -170,19 +170,20 @@ public class Micro1Viewer {
      * Step through and tell user when program is terminated
      */
 
+    // Christopher ==============================
     public static boolean step(int numSteps) {
         boolean halt = false;
         for (int i = 0; i < numSteps && !halt; i++) {
-            if (!halt)
-                halt = console.getCPU().step();
-
-            if (halt) {
+            if (!halt) {
+                halt = console.getCPU().step(); // Something seems to be wrong here?
+            } else {
                 System.out.println("program terminated");
                 return false;
             }
         }
         System.out.println("done");
         return true;
+        // ===========================================
     }
 
     // ===========================================
