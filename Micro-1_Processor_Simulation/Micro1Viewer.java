@@ -162,8 +162,12 @@ public class Micro1Viewer {
     public static void createInputDialog() {
         String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
         int numSteps = Integer.parseInt(userInput);
-        if (!step(numSteps))
-            ; // break
+        try {
+            if (!step(numSteps))
+                ; // break
+        } catch (Exception e) {
+            // add error message
+        }
     }
 
     /**
@@ -171,7 +175,7 @@ public class Micro1Viewer {
      */
 
     // Christopher ==============================
-    public static boolean step(int numSteps) {
+    public static boolean step(int numSteps) throws Exception {
         boolean halt = false;
         for (int i = 0; i < numSteps && !halt; i++) {
             if (!halt) {
