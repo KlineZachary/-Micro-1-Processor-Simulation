@@ -1,0 +1,9 @@
+x[] = 47;
+loop = 47;
+i = 2;
+x[1] = 1;
+while; loop;
+    x[i] = x[i-1] + x[i-2];
+    i = i+1;
+    loop = loop-1;
+end;

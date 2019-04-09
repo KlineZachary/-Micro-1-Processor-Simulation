@@ -19,11 +19,10 @@ public class MyCompiler {
     // 7; add 1 2; store 0 1;
 
     int index = 0;
-    String previousToken = null;
     boolean isExpectingBool = false;
+    Queue<String> insert;
 
     public String evaluate(String line, int reg, int tempReg) throws Exception {
-        System.out.println("Evaluating: " + line + " @ " + reg);
         if (!line.matches(".*[a-zA-Z0-9].*")) {
             throw new Exception("Empty Expression");
         }
@@ -47,14 +46,13 @@ public class MyCompiler {
             }
             out.append(addLabel(elseNum));
         } else if (!line.contains("=")) {
+            out.append(handleExpression(line, reg, tempReg));
             if (isExpectingBool) {
-                out.append(loadConst(":go" + jumpCount, tempReg));
+                out.append(loadConst(":go" + Integer.toHexString(jumpCount), tempReg));
                 out.append("not ").append(reg).append(" ").append(reg);
                 out.append("\nif ").append(reg).append(" ").append(tempReg).append("\n");
                 jumpStack.push(jumpCount++);
                 isExpectingBool = false;
-            } else {
-                out.append(handleExpression(line, reg, tempReg));
             }
         } else {
             String[] parts = divideStatement(line);
@@ -65,77 +63,6 @@ public class MyCompiler {
         }
         // out.append(pop(reg));
         return out.toString();
-    }
-
-    public String loadVar(String var, int reg, int tempReg) throws Exception {
-        StringBuilder out = new StringBuilder();
-        if (isIndexed(var)) {
-            String[] parts = divideIndexedVariable(var);
-            var = parts[0];
-            String index = parts[1];
-
-            out.append(push(reg, tempReg));
-            out.append(evaluate(index, reg, tempReg));
-            out.append(push(reg, tempReg));
-            out.append(loadAddress(var, reg));
-            out.append(pop(tempReg));
-            out.append("add ").append(reg).append(" ").append(tempReg).append("\n");
-            out.append(pop(tempReg));
-            out.append("load ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(reg))
-                    .append("\n");
-
-        } else {
-            out.append(loadAddress(var, reg));
-            out.append("load " + reg + " " + reg + "\n");
-        }
-        return out.toString();
-    }
-
-    public String saveVar(String var, int reg, int tempReg) throws Exception {
-        StringBuilder out = new StringBuilder();
-        if (isIndexed(var)) {
-            String[] parts = divideIndexedVariable(var);
-            var = parts[0];
-            String index = parts[1];
-
-            out.append(push(reg, tempReg));
-            out.append(evaluate(index, reg, tempReg));
-            out.append(push(reg, tempReg));
-            out.append(loadAddress(var, reg));
-            out.append(pop(tempReg));
-            out.append("add ").append(reg).append(" ").append(tempReg).append("\n");
-            out.append(pop(tempReg));
-            out.append("store ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(tempReg))
-                    .append("\n");
-        } else {
-            out.append(push(reg, tempReg));
-            out.append(loadAddress(var, reg));
-            out.append(pop(tempReg));
-            out.append("store ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(tempReg))
-                    .append("\n");
-        }
-        return out.toString();
-    }
-
-    public boolean isIndexed(String s) {
-        return s.matches(".*[\\[\\]].*");
-    }
-
-    public boolean isVariable(String s) throws Exception {
-        if (s.matches("[0-9]+") || s.matches(".*[^a-zA-Z0-9].*")) {
-            return false;
-        }
-        s = isIndexed(s) ? divideIndexedVariable(s)[0] : s;
-        return variables.containsKey(s);
-    }
-
-    public String[] divideIndexedVariable(String var) throws Exception {
-        if (!var.matches("[a-zA-Z0-9]+\\[.*\\]")) {
-            throw new Exception("Invalid array element: " + var);
-        }
-        String[] parts = var.split("\\[", 2);
-        parts[1] = parts[1].substring(0, parts[1].length() - 1);
-        return parts;
     }
 
     public String[] divideStatement(String line) throws Exception {
@@ -152,21 +79,17 @@ public class MyCompiler {
         Queue<String> q = postFix(expression);
         while (!q.isEmpty()) {
             String token = q.poll();
-            System.out.println("Token: " + token);
-            if (token.matches("[a-zA-Z0-9]+")) {
+            if (isValued(token)) {
                 out.append(load(token, reg, tempReg));
                 out.append(push(reg, tempReg));
             } else {
-                out.append(pop(reg));
                 out.append(pop(tempReg));
-                out.append(getOperator(token)).append(" " + reg + " " + tempReg + "\n");
+                out.append(pop(reg));
+                out.append(getOperator(token)).append(" ").append(reg).append(" ").append(tempReg).append("\n");
                 out.append(push(reg, tempReg));
             }
         }
-        // if (!nums.isEmpty()) {
-        // String num = nums.pop();
-        // out.append(load(num, reg, tempReg));
-        // }
+        out.append(pop(reg));
         return out.toString();
 
     }
@@ -175,11 +98,81 @@ public class MyCompiler {
         return isVariable(num) ? loadVar(num, reg, tempReg) : loadConst(num, reg);
     }
 
+    public String loadVar(String var, int reg, int tempReg) throws Exception {
+        StringBuilder out = new StringBuilder();
+        if (isIndexed(var)) {
+            String[] parts = divideIndexedVariable(var);
+            var = parts[0];
+            String index = parts[1];
+            out.append(evaluate(index, reg, tempReg));
+            out.append(loadAddress(var, tempReg));
+            out.append("add ").append(reg).append(" ").append(tempReg).append("\n");
+
+        } else {
+            out.append(loadAddress(var, reg));
+        }
+        out.append("load ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(reg)).append("\n");
+        return out.toString();
+    }
+
+    public String saveVar(String var, int reg, int tempReg) throws Exception {
+        StringBuilder out = new StringBuilder();
+        if (isIndexed(var)) {
+            String[] parts = divideIndexedVariable(var);
+            var = parts[0];
+            String index = parts[1];
+
+            out.append(push(reg, tempReg));
+            out.append(push(reg, tempReg));
+            out.append(evaluate(index, reg, tempReg));
+            out.append(push(reg, tempReg));
+            out.append(loadAddress(var, reg));
+            out.append(pop(tempReg));
+            out.append("add ").append(reg).append(" ").append(tempReg).append("\n");
+            out.append(pop(tempReg));
+            out.append("store ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(tempReg))
+                    .append("\n");
+        } else {
+            out.append(push(reg, tempReg));
+            out.append(push(reg, tempReg));
+            out.append(loadAddress(var, reg));
+            out.append(pop(tempReg));
+            out.append("store ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(tempReg))
+                    .append("\n");
+        }
+        out.append(pop(reg));
+        return out.toString();
+    }
+
+    public boolean isIndexed(String s) {
+        return s.matches(".*[\\[\\]].*");
+    }
+
+    public boolean isVariable(String s) throws Exception {
+        if (!isValued(s)) {
+            return false;
+        }
+        s = isIndexed(s) ? divideIndexedVariable(s)[0] : s;
+        return variables.containsKey(s);
+    }
+
+    public boolean isValued(String s) throws Exception {
+        return s.matches("[a-zA-Z0-9]+\\[.+\\]|[a-zA-Z0-9]+");
+    }
+
+    public String[] divideIndexedVariable(String var) throws Exception {
+        if (!var.matches("[a-zA-Z0-9]+\\[.*\\]")) {
+            throw new Exception("Invalid array element: " + var);
+        }
+        String[] parts = var.split("\\[", 2);
+        parts[1] = parts[1].substring(0, parts[1].length() - 1);
+        return parts;
+    }
+
     public String loadConst(String num, int reg) throws Exception {
-        String base = "loadc " + Integer.toHexString(reg) + "\n";
         if (num.matches("[0-9]+"))
-            return base + parse(num) + "\n";
-        return base + num + "\n";
+            return loadConst(Integer.parseInt(num), reg);
+        return "loadc " + Integer.toHexString(reg) + "\n" + num + "\n";
     }
 
     public String loadConst(int num, int reg) {
@@ -204,10 +197,12 @@ public class MyCompiler {
 
     public Queue<String> postFix(String expression) throws Exception {
         Queue<String> out = new LinkedList<>();
+        insert = new LinkedList<>();
         Stack<String> operators = new Stack<>();
-        while (index < expression.length()) {
+        String prev = null;
+        while (index < expression.length() || !insert.isEmpty()) {
             String token = nextToken(expression);
-            if (token.matches("[a-zA-Z0-9]+")) {
+            if (isValued(token)) {
                 out.add(token);
             } else if (token.equals("(")) {
                 operators.push(token);
@@ -219,6 +214,9 @@ public class MyCompiler {
                 }
                 operators.pop();
 
+            } else if (token.equals("-") && (prev == null || (isOperator(prev) && !prev.equals(")")))) {
+                insert.add("0");
+                insert.add("-");
             } else {
                 if (!operators.isEmpty()) {
                     int a = precedence(token), b = precedence(operators.peek());
@@ -231,7 +229,7 @@ public class MyCompiler {
                 }
                 operators.push(token);
             }
-            previousToken = token;
+            prev = token;
         }
         while (!operators.isEmpty()) {
             if (operators.peek().equals("(")) {
@@ -294,16 +292,25 @@ public class MyCompiler {
     }
 
     public String nextToken(String expression) throws Exception {
-        // System.out.println("Next Token of: " + expression);
+        if (!insert.isEmpty())
+            return insert.poll();
         int startIndex = index;
+        int bracket = 0;
         if (Character.isLetterOrDigit(expression.charAt(index))) {
-            while (++index < expression.length() && Character.isLetterOrDigit(expression.charAt(index))) {
+            while (++index < expression.length() && (Character.isLetterOrDigit(expression.charAt(index))
+                    || expression.charAt(index) == '[' || bracket > 0)) {
+                if (expression.charAt(index) == '[') {
+                    bracket++;
+                } else if (expression.charAt(index) == ']') {
+                    if (--bracket == 0) {
+                        index++;
+                        break;
+                    }
+                }
             }
         } else {
             index = expression.length();
             while (!isOperator(expression.substring(startIndex, index--))) {
-                // System.out.println("Checking:" + expression.substring(startIndex, index +
-                // 1));
             }
             index++;
         }
