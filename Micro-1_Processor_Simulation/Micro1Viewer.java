@@ -177,7 +177,7 @@ public class Micro1Viewer {
             case 3:// Empty Text
                 textArea.setText("");
                 break;
-            case 4:// Step
+            case 4:// Step //
                 try {
                     createInputDialog();
                     
