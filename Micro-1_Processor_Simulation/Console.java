@@ -264,6 +264,9 @@ public class Console {
 	public Memory getMemory() {
 		return memory;
 	}
+	public MyCompiler getCompiler(){
+		return compiler;
+	}
 
 	/**
 	 * This is the read-execute-print loop for the console. It perpetually
