@@ -163,20 +163,21 @@ public class Console {
 					String evaluated = compiler.evaluate(line, 1, 0);
 					if (evaluated.length() > 0) {
 						b.append(evaluated);
-						// b.append("halt");
 					}
 				}
 				lineNumber++;
 			}
+			b.append("halt");
 			System.out.println("Compiled successfully");
-			String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm2";
+			String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm";
+			// String asmName = "assembled.assm";
 			PrintWriter writer = new PrintWriter(asmName);
 			writer.println(b.toString());
 			writer.close();
 			assemble(asmName);
 		} catch (Exception e) {
 			System.out.println("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 
@@ -194,9 +195,13 @@ public class Console {
 		if (compiler == null) {
 			System.out.println("No file was compiled");
 		} else if (compiler.containsVariable(var)) {
-			for (int i = 0; i < len; i++) {
-				System.out.println(var + "[" + i + "]=" + memory.read(compiler.getVariable(var) + i));
+			System.out.print(var + "=[");
+			if (len > 0)
+				System.out.print(memory.read(compiler.getVariable(var)));
+			for (int i = 1; i < len; i++) {
+				System.out.print("," + memory.read(compiler.getVariable(var) + i));
 			}
+			System.out.println("]");
 		} else {
 			System.out.println("Variable does not exist");
 		}
@@ -332,7 +337,7 @@ public class Console {
 	 * loop.
 	 */
 	public static void main(String[] args) {
-		Console console = new Console(4096);
+		Console console = new Console(1024);
 		console.controlLoop();
 	}
 

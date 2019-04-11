@@ -1,8 +1,0 @@
-x[]=20;
-loop=20;
-i=1;
-x[0]=1;
-while;loop;
-    x[i]=x[i-1]<<x[i-1];
-    i=i+1;
-end;

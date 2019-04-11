@@ -1,6 +1,0 @@
-quit
-load InputFile/group.txt
-step 14
-memory
-registers
-quit

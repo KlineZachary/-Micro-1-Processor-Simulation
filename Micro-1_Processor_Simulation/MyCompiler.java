@@ -4,7 +4,7 @@
  */
 import java.util.*;
 
-public class MyCompiler {
+public class MyCompiler {// Kevin
 
     String[] reservedWords = { "if", "while", "end" };
     HashMap<String, Integer> variables = new HashMap<>();

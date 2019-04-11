@@ -1,5 +1,0 @@
-quit
-asm InputFile/test1.txt
-step 2
-registers
-quit
