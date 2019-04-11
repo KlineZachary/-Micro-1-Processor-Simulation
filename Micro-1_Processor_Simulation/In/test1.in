@@ -1,0 +1,5 @@
+quit
+asm In/test1.txt
+step 2
+registers
+quit

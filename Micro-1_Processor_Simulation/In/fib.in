@@ -1,0 +1,4 @@
+cmp In/fib.txt
+step 10000
+arr x 47
+quit
