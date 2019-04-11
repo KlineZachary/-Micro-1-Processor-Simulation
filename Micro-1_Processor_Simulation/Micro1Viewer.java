@@ -35,8 +35,9 @@ public class Micro1Viewer {
 
         // Buttons //Edited by zach
         String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "?", "X" };
-        String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step", "Dump Memory",
-                "Display compiled var", "Display compiled arry", "Display all compiled vars", "Help", "Quit" };
+        String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step",
+                "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars", "Help",
+                "Quit" };
         Button.loadListener();
         Button.addAll(titles, tooltips, frame);
 
@@ -158,11 +159,10 @@ public class Micro1Viewer {
             // Zach=============
             switch (button.tag) {
             case 0:// machine code
-            
+
                 path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
                 console.load(path);
-                
-                
+
                 break;
             case 1:// assembly code
                 path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
@@ -180,7 +180,7 @@ public class Micro1Viewer {
             case 4:// Step //
                 try {
                     createInputDialog();
-                    
+
                     // Update Registers after stepping
                     DisplayRegister.updateRegisters();
                     JOptionPane.showMessageDialog(null, "Program Terminated");
@@ -189,7 +189,6 @@ public class Micro1Viewer {
                             JOptionPane.ERROR_MESSAGE);
                 }
 
-                
                 break;
             case 5:// Memory dumps
                 guiMemDump();
@@ -197,36 +196,36 @@ public class Micro1Viewer {
             case 6: // out
                 try {
                     String input = JOptionPane.showInputDialog(button.getParent(),
-                        "Enter the var name you would like to print");
+                            "Enter the var name you would like to print");
                     guiPrint(input);
-                 } catch (Exception error) {
-                        JOptionPane.showMessageDialog(null, "Error printing variable", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                 }
+                } catch (Exception error) {
+                    JOptionPane.showMessageDialog(null, "Error printing variable", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 break;
             case 7: // arr
-                 try {
-                    String input = JOptionPane.showInputDialog(button.getParent(),
-                        "Enter the array variable");
+                try {
+                    String input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
                     int sizeInput = (Integer.parseInt(JOptionPane.showInputDialog(button.getParent(),
-                    "Enter the number of elements you would like to see")));
+                            "Enter the number of elements you would like to see")));
                     guiPrintArr(input, sizeInput);
-                }catch (Exception error) {
-                        JOptionPane.showMessageDialog(null, "Error printing array value", "Error",
+                } catch (Exception error) {
+                    JOptionPane.showMessageDialog(null, "Error printing array value", "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
                 break;
             case 8: // all
-                try{
+                try {
                     guiPrintAll();
-                }catch(Exception error){
+                } catch (Exception error) {
                     JOptionPane.showMessageDialog(null, "Error printing all compiled variables", "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
                 break;
-            case 9:// Help
+            case 9:// Help //Edited by Chris
                 JOptionPane.showMessageDialog(null,
-                        "Built for Computer Organization class taught by Dr. Zhu\nDeveloped By: Zachary A. Kline, Kevin Chevalier, and Chris Aranda",
+                        "Built for Computer Organization class taught by Dr. Zhu\nDeveloped By: Zachary A. Kline, Kevin Chevalier, and Christopher Aranda\n\n"
+                                + "Help Catalog:\n\nMC: Loads a Machine Code File\nASM: Loads an assembly file\nCMP: Loads a compiler\n✄: Empty text\n"
+                                + "⤻: Step\n⤹: Dumps memory into text field\nOUT: Displays the compiled variables\nARR: Displays the compiled array\nALL: Displays all compiled variables\n",
                         "The Micro-1 Processor Simulation", JOptionPane.INFORMATION_MESSAGE);
                 ;
                 break;
@@ -248,8 +247,9 @@ public class Micro1Viewer {
     public static void createInputDialog() throws Exception {
         String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
         int numSteps = Integer.parseInt(userInput);
-        if (!guiStep(numSteps)) ; // break
-           
+        if (!guiStep(numSteps))
+            ; // break
+
     }
 
     /**
@@ -278,41 +278,44 @@ public class Micro1Viewer {
             textArea.append("cell[" + Integer.toHexString(i) + "] = " + Integer.toHexString(cells[i]) + "\n");
         }
     }
-    //Displays compiled var to textArea
+
+    // Displays compiled var to textArea
     public static void guiPrint(String var) throws Exception {
-		if (console.getCompiler() == null) {
+        if (console.getCompiler() == null) {
             JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
-		} else if (console.getCompiler().containsVariable(var)) {
-            textArea.setText( var + "=" + console.getMemory().read(console.getCompiler().getVariable(var)));
-		} else {
+        } else if (console.getCompiler().containsVariable(var)) {
+            textArea.setText(var + "=" + console.getMemory().read(console.getCompiler().getVariable(var)));
+        } else {
             JOptionPane.showMessageDialog(null, "Variable does not exist", "Error", JOptionPane.ERROR_MESSAGE);
 
-		}
+        }
     }
-    //Displays elements in array
+
+    // Displays elements in array
     public static void guiPrintArr(String var, int len) throws Exception {
-		if (console.getCompiler() == null) {
+        if (console.getCompiler() == null) {
             JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
-		} else if (console.getCompiler().containsVariable(var)) {
-			for (int i = 0; i < len; i++) {
-                textArea.append(var + "[" + i + "]=" + console.getMemory().read(console.getCompiler().getVariable(var) + i) + "\n");
-			}
-		} else {
+        } else if (console.getCompiler().containsVariable(var)) {
+            for (int i = 0; i < len; i++) {
+                textArea.append(var + "[" + i + "]="
+                        + console.getMemory().read(console.getCompiler().getVariable(var) + i) + "\n");
+            }
+        } else {
             JOptionPane.showMessageDialog(null, "Variable does not exist", "Error", JOptionPane.ERROR_MESSAGE);
-		}
+        }
     }
-    
+
     public static void guiPrintAll() throws Exception {
-		if (console.getCompiler() == null) {
+        if (console.getCompiler() == null) {
             JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
-		} else {
-			Iterator<String> vars = console.getCompiler().getAllVariables().iterator();
-			while (vars.hasNext()) {
+        } else {
+            Iterator<String> vars = console.getCompiler().getAllVariables().iterator();
+            while (vars.hasNext()) {
                 String var = vars.next();
                 textArea.append(var + "=" + console.getMemory().read(console.getCompiler().getVariable(var)) + "\n");
-			}
-		}
-	}
+            }
+        }
+    }
 
     // ===========================================
 }
