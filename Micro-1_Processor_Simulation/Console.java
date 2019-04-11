@@ -136,12 +136,13 @@ public class Console {
 			}
 			scan.close();
 
-			String[] lines = b.toString().replace("\\w", "").replace("true", "1").replace("false", "0").split(";");
+			String[] lines = b.toString().replaceAll("\\s+", "").replace("true", "1").replace("false", "0").split(";");
 
 			b = new StringBuilder();
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
 				boolean isArrayDeclaration = false;
+
 				if (line.contains("=")) {
 					String[] parts = line.split("=");
 					String var = parts[0].split("\\[")[0];
@@ -224,8 +225,8 @@ public class Console {
 		System.out.println("memory \t\t dumps memory to console");
 		System.out.println("registers \t dumps registers to console");
 		System.out.println("step N \t\t executes next N instructions or until halt");
-		System.out.println("out varName\t\t displays a compiled variable");
-		System.out.println("arr var size \t\t displays a compiled array");
+		System.out.println("out varName\t displays a compiled variable");
+		System.out.println("arr var size\t displays a compiled array");
 		System.out.println("allout \t\t displays all compiled variables");
 		System.out.println("help \t\t displays this message");
 		System.out.println("quit \t\t terminate console");
@@ -262,6 +263,9 @@ public class Console {
 
 	public Memory getMemory() {
 		return memory;
+	}
+	public MyCompiler getCompiler(){
+		return compiler;
 	}
 
 	/**
@@ -328,7 +332,7 @@ public class Console {
 	 * loop.
 	 */
 	public static void main(String[] args) {
-		Console console = new Console();
+		Console console = new Console(4096);
 		console.controlLoop();
 	}
 

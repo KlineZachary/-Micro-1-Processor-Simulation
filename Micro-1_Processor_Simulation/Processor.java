@@ -32,7 +32,7 @@ public class Processor {
         int a = (IR & (decoder <<= 4)) >> 4;// read next 4
         int p = (IR & (decoder <<= 4)) >> 8;// read next 4
         // System.out.println("ML: " + p + " " + a + " " + b);
-        boolean debug = true;
+        boolean debug = false;
         switch (p) {// command list + execution code
         case 1:
             if (debug)
@@ -139,7 +139,7 @@ public class Processor {
         }
         return true;
     }
-
+    /////Think Zach cant remember
     public String[] guiDump() {
         String[] regNumbers = new String[reg.length];
         for (int i = 0; i < 8; i++) {

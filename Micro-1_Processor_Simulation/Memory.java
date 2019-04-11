@@ -31,6 +31,10 @@ public class Memory {
         return cap; // Zach
     }
 
+    public int[] getCells(){
+        return cell;
+    }
+
     public void isValidAddress(int addr) throws Exception {
         if (addr < 0 || addr >= cap)
             throw new Exception("Invalid memory access at " + addr);
