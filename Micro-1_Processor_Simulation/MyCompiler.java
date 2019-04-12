@@ -40,7 +40,7 @@ public class MyCompiler {// Kevin
                 if (whileNum > 0) {
                     jumpStack.push(whileNum);
                 } else {
-                    out.append(loadConst(1, reg)).append(loadConst(":go" + Integer.toHexString(-whileNum), tempReg))
+                    out.append(loadConst(1, reg)).append(loadConst("goto " + Integer.toHexString(-whileNum), tempReg))
                             .append("if " + reg + " " + tempReg + "\n");
                 }
             }
@@ -48,9 +48,9 @@ public class MyCompiler {// Kevin
         } else if (!line.contains("=")) {
             out.append(handleExpression(line, reg, tempReg));
             if (isExpectingBool) {
-                out.append(loadConst(":go" + Integer.toHexString(jumpCount), tempReg));
-                out.append("not ").append(reg).append(" ").append(reg);
-                out.append("\nif ").append(reg).append(" ").append(tempReg).append("\n");
+                out.append(loadConst("goto " + Integer.toHexString(jumpCount), tempReg));
+                out.append(not(reg));
+                out.append("if ").append(reg).append(" ").append(tempReg).append("\n");
                 jumpStack.push(jumpCount++);
                 isExpectingBool = false;
             }
@@ -85,8 +85,13 @@ public class MyCompiler {// Kevin
             } else {
                 out.append(pop(tempReg));
                 out.append(pop(reg));
-                out.append(getOperator(token)).append(" ").append(reg).append(" ").append(tempReg).append("\n");
+                if (isComparsionOperator(token)) {
+                    out.append(handleComparsion(token, reg, tempReg));
+                } else {
+                    out.append(getOperator(token)).append(" ").append(reg).append(" ").append(tempReg).append("\n");
+                }
                 out.append(push(reg, tempReg));
+
             }
         }
         out.append(pop(reg));
@@ -106,7 +111,7 @@ public class MyCompiler {// Kevin
             String index = parts[1];
             out.append(evaluate(index, reg, tempReg));
             out.append(loadAddress(var, tempReg));
-            out.append("add ").append(reg).append(" ").append(tempReg).append("\n");
+            out.append(add(reg, tempReg));
 
         } else {
             out.append(loadAddress(var, reg));
@@ -128,7 +133,7 @@ public class MyCompiler {// Kevin
             out.append(push(reg, tempReg));
             out.append(loadAddress(var, reg));
             out.append(pop(tempReg));
-            out.append("add ").append(reg).append(" ").append(tempReg).append("\n");
+            out.append(add(reg, tempReg));
             out.append(pop(tempReg));
             out.append("store ").append(Integer.toHexString(reg)).append(" ").append(Integer.toHexString(tempReg))
                     .append("\n");
@@ -192,7 +197,7 @@ public class MyCompiler {// Kevin
     }
 
     public String addLabel(int num) {
-        return ":lb" + Integer.toHexString(num) + "\n";
+        return "label" + Integer.toHexString(num) + "\n";
     }
 
     public Queue<String> postFix(String expression) throws Exception {
@@ -281,14 +286,37 @@ public class MyCompiler {// Kevin
         case "|":
             return "bwd";
         case "^":
-            return "";
+            return "halt";
         default:
-            return "";
+            return "halt";
+        }
+    }
+
+    public String handleComparsion(String op, int regA, int regB) {
+        switch (op) {
+        case ">":
+            return greaterThan(regA, regB);
+        case "<":
+            return lessThan(regA, regB);
+        case ">=":
+            return greaterEqual(regA, regB);
+        case "<=":
+            return lessEqual(regA, regB);
+        case "==":
+            return equalTo(regA, regB);
+        case "!=":
+            return notEqual(regA, regB);
+        default:
+            return "halt";
         }
     }
 
     public boolean isOperator(String s) {
-        return s.matches("\\+|\\-|\\*|/|!|&&|\\|\\||<<|>>|&|\\||\\^|\\(|\\)");
+        return s.matches("\\+|\\-|\\*|/|!|&&|\\|\\||<<|>>|&|\\||\\^|\\(|\\)") || isComparsionOperator(s);
+    }
+
+    public boolean isComparsionOperator(String s) {
+        return s.matches(">|<|==|!=|>=|<=");
     }
 
     public String nextToken(String expression) throws Exception {
@@ -318,6 +346,70 @@ public class MyCompiler {// Kevin
         if (isReserved(token))
             throw new Exception("Illegal use of '" + token + "'");
         return token;
+    }
+
+    public String add(int regA, int regB) {
+        return "add " + regA + " " + regB + "\n";
+    }
+
+    public String sub(int regA, int regB) {
+        return "sub " + regA + " " + regB + "\n";
+    }
+
+    public String or(int regA, int regB) {
+        return "or " + regA + " " + regB + "\n";
+    }
+
+    public String bitOr(int regA, int regB) {
+        return "bwd " + regA + " " + regB + "\n";
+    }
+
+    public String and(int regA, int regB) {
+        return "and " + regA + " " + regB + "\n";
+    }
+
+    public String not(int reg) {
+        return not(reg, reg);
+    }
+
+    public String not(int ansReg, int reg) {
+        return "not " + ansReg + " " + reg + "\n";
+    }
+
+    public String move(int regA, int regB) {
+        return loadConst(0, regB) + add(regB, regA);
+    }
+
+    public String greaterThan(int regA, int regB) {// regB , regA need to be pushed in that order
+        return sub(regA, regB);
+    }
+
+    public String lessThan(int regA, int regB) {
+        return sub(regB, regA) + move(regB, regA);
+    }
+
+    public String equalTo(int regA, int regB) {
+        return greaterThan(regA, regB) + not(regA);
+    }
+
+    public String notEqual(int regA, int regB) {
+        return equalTo(regA, regB) + not(regA);
+    }
+
+    public String lessEqual(int regA, int regB) {
+        StringBuilder out = new StringBuilder();
+        out.append(lessThan(regA, regB));
+        out.append(loadConst(1, regB));
+        out.append(bitOr(regA, regB));
+        return out.toString();
+    }
+
+    public String greaterEqual(int regA, int regB) {
+        StringBuilder out = new StringBuilder();
+        out.append(greaterThan(regA, regB));
+        out.append(loadConst(1, regB));
+        out.append(bitOr(regA, regB));
+        return out.toString();
     }
 
     public void insertVariable(String var, int size) throws Exception {

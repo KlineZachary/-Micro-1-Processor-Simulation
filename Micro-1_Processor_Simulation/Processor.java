@@ -129,17 +129,18 @@ public class Processor {
             reg[a] = reg[a] | reg[b];
             break;
         case 15:// if
-            if (debug && reg[a] != 0)
+            if (debug && reg[a] > 0)
                 System.out.println("PC = REG[" + b + "] = " + reg[b]);
 
-            if (reg[a] != 0)
+            if (reg[a] > 0)
                 PC = reg[b];
             break;
         // ==============================================================
         }
         return true;
     }
-    /////Think Zach cant remember
+
+    ///// Think Zach cant remember
     public String[] guiDump() {
         String[] regNumbers = new String[reg.length];
         for (int i = 0; i < 8; i++) {
