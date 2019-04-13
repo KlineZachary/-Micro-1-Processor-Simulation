@@ -80,13 +80,13 @@ public class Console {
 			ArrayList<String> tokens = new ArrayList<String>();
 			for (int lineNum = 0; scan.hasNext(); lineNum++) {
 				String token = current = scan.next();
-				if (token.startsWith(":lb")) {
-					assembler.insertLabel(Integer.parseInt(token.substring(3), 16), lineNum--);
+				if (token.startsWith("label")) {
+					assembler.insertLabel(Integer.parseInt(token.substring(5), 16), lineNum--);
 
 				} else {
 					tokens.add(token);
 
-					if (token.startsWith(":go")) {
+					if (token.startsWith("goto")) {
 						continue;
 					}
 					if (token.matches("[0-9a-f]+") && !token.equals("add")) {
@@ -101,8 +101,8 @@ public class Console {
 			}
 			for (int i = 0; i < tokens.size();) {
 				String instr = current = tokens.get(i++);
-				if (instr.startsWith(":go")) {
-					memory.write(address++, assembler.getLine(Integer.parseInt(instr.substring(3), 16)));
+				if (instr.startsWith("goto")) {
+					memory.write(address++, assembler.getLine(Integer.parseInt(instr.substring(4), 16)));
 					continue;
 				}
 				if (instr.matches("[0-9a-f]+") && !instr.equals("add")) {
@@ -142,10 +142,11 @@ public class Console {
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
 				boolean isArrayDeclaration = false;
-
-				if (line.contains("=")) {
-					String[] parts = line.split("=");
-					String var = parts[0].split("\\[")[0];
+				String[] parts = compiler.divideStatement(line);
+				if (parts != null) {
+					String var = parts[0];
+					if (compiler.isIndexed(var))
+						var = compiler.divideIndexedVariable(var)[0];
 					int size = 1;
 					if (line.matches(".*\\[\\].*")) {
 						if (!line.matches("[0-9a-zA-Z]+\\[\\]=[0-9]+")) {
@@ -195,13 +196,14 @@ public class Console {
 		if (compiler == null) {
 			System.out.println("No file was compiled");
 		} else if (compiler.containsVariable(var)) {
-			System.out.print(var + "=[");
+			StringBuilder out = new StringBuilder();
+			out.append(var).append("=[");
 			if (len > 0)
-				System.out.print(memory.read(compiler.getVariable(var)));
+				out.append(memory.read(compiler.getVariable(var)));
 			for (int i = 1; i < len; i++) {
-				System.out.print("," + memory.read(compiler.getVariable(var) + i));
+				out.append("," + memory.read(compiler.getVariable(var) + i));
 			}
-			System.out.println("]");
+			System.out.println(out.append("]").toString());
 		} else {
 			System.out.println("Variable does not exist");
 		}
@@ -247,13 +249,12 @@ public class Console {
 			num = kbd.nextInt();
 			boolean halt = false;
 			for (int i = 0; i < num && !halt; i++) {
-				// System.out.println("STEP: " + i + "/" + num);
 				if (!halt) {
 					halt = cpu.step();
 				}
 
 				if (halt) {
-					System.out.println("program terminated");
+					System.out.println("program terminated at step " + (i + 1));
 					return false;
 				}
 			}
@@ -269,7 +270,8 @@ public class Console {
 	public Memory getMemory() {
 		return memory;
 	}
-	public MyCompiler getCompiler(){
+
+	public MyCompiler getCompiler() {
 		return compiler;
 	}
 

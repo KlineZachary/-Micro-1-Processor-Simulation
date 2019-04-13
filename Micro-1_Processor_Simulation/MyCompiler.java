@@ -6,7 +6,7 @@ import java.util.*;
 
 public class MyCompiler {// Kevin
 
-    String[] reservedWords = { "if", "while", "end" };
+    String[] reservedWords = { "if", "while", "end", "goto", "label", "halt" };
     HashMap<String, Integer> variables = new HashMap<>();
     Stack<Integer> jumpStack = new Stack<>();
     int jumpCount = 1;
@@ -26,59 +26,80 @@ public class MyCompiler {// Kevin
         if (!line.matches(".*[a-zA-Z0-9].*")) {
             throw new Exception("Empty Expression");
         }
+
         StringBuilder out = new StringBuilder();
-        if (line.equals("if")) {
+        if (line.equals("halt")) {
+            out.append("halt\n");
+        } else if (line.equals("if")) {
             isExpectingBool = true;
         } else if (line.equals("while")) {
             isExpectingBool = true;
-            out.append(addLabel(jumpCount));
-            jumpStack.push(-1 * (jumpCount++));
+            jumpStack.push(-jumpCount);
+            out.append(addLabel(jumpCount++));
         } else if (line.equals("end")) {
-            int elseNum = jumpStack.pop();
-            if (!jumpStack.isEmpty()) {
-                int whileNum = jumpStack.pop();
-                if (whileNum > 0) {
-                    jumpStack.push(whileNum);
-                } else {
-                    out.append(loadConst(1, reg)).append(loadConst("goto " + Integer.toHexString(-whileNum), tempReg))
-                            .append("if " + reg + " " + tempReg + "\n");
-                }
+            int labelAddr = jumpStack.pop();
+            if (!jumpStack.isEmpty() && jumpStack.peek() < 0) {
+                out.append(loadConst(0, reg));
+                out.append(addGoTo(-jumpStack.pop(), tempReg, reg));
             }
-            out.append(addLabel(elseNum));
-        } else if (!line.contains("=")) {
-            out.append(handleExpression(line, reg, tempReg));
-            if (isExpectingBool) {
-                out.append(loadConst("goto " + Integer.toHexString(jumpCount), tempReg));
-                out.append(not(reg));
-                out.append("if ").append(reg).append(" ").append(tempReg).append("\n");
-                jumpStack.push(jumpCount++);
-                isExpectingBool = false;
-            }
+            out.append(addLabel(labelAddr));// 5>2 5-2 3
         } else {
+            boolean isBoolNext = isExpectingBool;
+            isExpectingBool = false;
+
             String[] parts = divideStatement(line);
-            String var = parts[0];
-            String expression = parts[1];
-            out.append(evaluate(expression, reg, tempReg));
-            out.append(saveVar(var, reg, tempReg));
+            // System.out.println("Expression: " + line + " -> " + Arrays.toString(parts));
+
+            if (parts == null) {
+                out.append(handleExpression(line, reg, tempReg));
+            } else {
+                String var = parts[0];
+                String expression = parts[1];
+                out.append(evaluate(expression, reg, tempReg));
+                out.append(saveVar(var, reg, tempReg));
+            }
+            if (isBoolNext) {
+                out.append(addGoTo(jumpCount, tempReg, reg));
+                jumpStack.push(jumpCount++);
+            }
         }
         // out.append(pop(reg));
         return out.toString();
     }
 
     public String[] divideStatement(String line) throws Exception {
-        String[] parts = line.split("=", 2);
-        if (parts.length == 1) {
-            throw new Exception("Empty Expression");
+        int bracket = 0;
+        for (int i = 0; i < line.length(); i++) {
+            switch (line.charAt(i)) {
+            case '[':
+                bracket++;
+                break;
+            case ']':
+                if (bracket-- <= 0)
+                    throw new Exception("unexpected ']'");
+
+                break;
+            case '=':
+                if (bracket == 0 && !isComparsionOperator(line.substring(i, i + 2))
+                        && !isComparsionOperator(line.substring(i - 1, i + 1))) {
+                    String[] out = { line.substring(0, i), line.substring(i + 1) };
+                    return out;
+                }
+            }
         }
-        return parts;
+        if (bracket != 0)
+            throw new Exception("expecting ']'");
+        return null;
     }
 
     public String handleExpression(String expression, int reg, int tempReg) throws Exception {
         StringBuilder out = new StringBuilder();
         index = 0;
         Queue<String> q = postFix(expression);
+        // System.out.println("EXPRESSION: " + expression);
         while (!q.isEmpty()) {
             String token = q.poll();
+            // System.out.println("Token: " + token);
             if (isValued(token)) {
                 out.append(load(token, reg, tempReg));
                 out.append(push(reg, tempReg));
@@ -154,15 +175,21 @@ public class MyCompiler {// Kevin
     }
 
     public boolean isVariable(String s) throws Exception {
-        if (!isValued(s)) {
+        if (!isValued(s) || isConst(s)) {
             return false;
         }
         s = isIndexed(s) ? divideIndexedVariable(s)[0] : s;
-        return variables.containsKey(s);
+        if (variables.containsKey(s))
+            return true;
+        throw new Exception(s + " was not initialized.");
     }
 
     public boolean isValued(String s) throws Exception {
         return s.matches("[a-zA-Z0-9]+\\[.+\\]|[a-zA-Z0-9]+");
+    }
+
+    public boolean isConst(String s) throws Exception {
+        return s.matches("[0-9]+");
     }
 
     public String[] divideIndexedVariable(String var) throws Exception {
@@ -198,6 +225,10 @@ public class MyCompiler {// Kevin
 
     public String addLabel(int num) {
         return "label" + Integer.toHexString(num) + "\n";
+    }
+
+    public String addGoTo(int addr, int addrReg, int condReg) throws Exception {
+        return loadConst("goto" + Integer.toHexString(addr), addrReg) + "if " + condReg + " " + addrReg + "\n";
     }
 
     public Queue<String> postFix(String expression) throws Exception {
@@ -246,22 +277,46 @@ public class MyCompiler {// Kevin
         return out;
     }
 
-    public int precedence(String op) {
+    public int precedence(String op) throws Exception {
         switch (op) {
+        case "=":
+            return 0;
+        case "||":
+            return 3;
+        case "&&":
+            return 4;
+        case "|":
+            return 5;
+        case "&":
+            return 7;
+        case "==":
+        case "!=":
+            return 8;
+        case ">":
+        case "<":
+        case ">=":
+        case "<=":
+            return 9;
+        case ">>":
+        case "<<":
+            return 10;
         case "+":
         case "-":
-            return 0;
+            return 11;
         case "*":
         case "/":
-            return 1;
-        case "^":
-            return 2;
+            return 12;
+        case "(":
+        case ")":
+        case "[":
+        case "]":
+            return 16;
         default:
-            return -1;
+            throw new Exception("Unknown operator: " + op);
         }
     }
 
-    public String getOperator(String op) {
+    public String getOperator(String op) throws Exception {
         switch (op) {
         case "+":
             return "add";
@@ -285,10 +340,8 @@ public class MyCompiler {// Kevin
             return "bwc";
         case "|":
             return "bwd";
-        case "^":
-            return "halt";
         default:
-            return "halt";
+            throw new Exception("Unknown operator: " + op);
         }
     }
 

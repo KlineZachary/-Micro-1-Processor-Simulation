@@ -1,242 +1,242 @@
 loadc 1
 2
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3cf
+cf
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 1
-3d0
+d0
 loadc 0
-3ce
+ce
 load 0 0
 store 1 0
 loadc 1
-3cf
+cf
 load 1 1
 loadc 1
 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3cf
+cf
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 1
 1
 loadc 0
-3cd
+cd
 store 0 1
 loadc 1
-3cd
+cd
 load 1 1
 loadc 0
-3cd
+cd
 store 0 1
 loadc 1
-3d1
+d1
 loadc 0
-3cd
+cd
 load 0 0
 add 1 0
 loadc 0
-3ce
+ce
 load 0 0
 store 1 0
 loadc 1
-3cf
+cf
 load 1 1
-:lb1
+label1
 loadc 1
 2f
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3d0
+d0
 load 1 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 0
-3ce
+ce
 load 0 0
 loadc 1
-3cf
+cf
 load 1 1
 sub 1 0
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3cf
+cf
 load 1 1
 loadc 0
-:go2
+goto 2
 not 1 1
 if 1 0
 loadc 1
-3d0
+d0
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 0
-3ce
+ce
 load 0 0
 loadc 1
-3cf
+cf
 load 1 1
 sub 1 0
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3cf
+cf
 load 1 1
 loadc 0
-3d1
+d1
 add 1 0
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3d0
+d0
 load 1 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 1
 2
 loadc 0
-3cd
+cd
 store 0 1
 loadc 0
-3cd
+cd
 load 0 0
 loadc 1
-3ce
+ce
 load 1 1
 sub 1 0
 loadc 0
-3ce
+ce
 store 0 1
 loadc 1
-3ce
+ce
 load 1 1
 loadc 0
-3d1
+d1
 add 1 0
 load 1 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 0
-3ce
+ce
 load 0 0
 loadc 1
-3cf
+cf
 load 1 1
 add 1 0
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3cf
+cf
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 1
-3d0
+d0
 load 1 1
 loadc 0
-3cd
+cd
 store 0 1
 loadc 1
-3cd
+cd
 load 1 1
 loadc 0
-3cd
+cd
 store 0 1
 loadc 1
-3d1
+d1
 loadc 0
-3cd
+cd
 load 0 0
 add 1 0
 loadc 0
-3ce
+ce
 load 0 0
 store 1 0
 loadc 1
-3cf
+cf
 load 1 1
 loadc 1
-3d0
+d0
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 0
-3ce
+ce
 load 0 0
 loadc 1
-3cf
+cf
 load 1 1
 add 1 0
 loadc 0
-3cf
+cf
 store 0 1
 loadc 1
-3cf
+cf
 load 1 1
 loadc 0
-3cf
+cf
 store 0 1
 loadc 0
-3ce
+ce
 store 0 1
 loadc 1
-3d0
+d0
 loadc 0
-3ce
+ce
 load 0 0
 store 1 0
 loadc 1
-3cf
+cf
 load 1 1
 loadc 1
 1
 loadc 0
-:go1
+goto 1
 if 1 0
-:lb2
+label2
 halt

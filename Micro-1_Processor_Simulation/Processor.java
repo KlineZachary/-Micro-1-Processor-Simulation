@@ -87,19 +87,19 @@ public class Processor {
             if (debug)
                 System.out.println("REG[" + a + "] = " + reg[a] + "&&" + reg[b]);
 
-            reg[a] = (reg[a] != 0 && reg[b] != 0) ? 1 : 0;
+            reg[a] = (reg[a] > 0 && reg[b] > 0) ? 1 : 0;
             break;
         case 9:// or
             if (debug)
                 System.out.println("REG[" + a + "] = " + reg[a] + "||" + reg[b]);
 
-            reg[a] = (reg[a] != 0 || reg[b] != 0) ? 1 : 0;
+            reg[a] = (reg[a] > 0 || reg[b] > 0) ? 1 : 0;
             break;
         case 10:// not
             if (debug)
                 System.out.println("REG[" + a + "] = !" + reg[b]);
 
-            reg[a] = (reg[b] != 0) ? 0 : 1;
+            reg[a] = (reg[b] > 0) ? 0 : 1;
             break;
         // ==============================================
         case 11:// lshift
@@ -129,10 +129,10 @@ public class Processor {
             reg[a] = reg[a] | reg[b];
             break;
         case 15:// if
-            if (debug && reg[a] > 0)
+            if (debug && reg[a] <= 0)
                 System.out.println("PC = REG[" + b + "] = " + reg[b]);
 
-            if (reg[a] > 0)
+            if (reg[a] <= 0)
                 PC = reg[b];
             break;
         // ==============================================================
