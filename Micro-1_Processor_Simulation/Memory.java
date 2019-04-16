@@ -17,10 +17,12 @@ public class Memory {
         cell[addr] = data;// Kevin
     }
 
-    public void dump() {
+    public String dump() {
+        StringBuilder b = new StringBuilder();
         for (int i = 0; i < cap; i++) {// Kevin
-            System.out.println("cell[" + Integer.toHexString(i) + "] = " + Integer.toHexString(cell[i]));
+            b.append("cell[").append(Integer.toHexString(i)).append( "] = ").append(Integer.toHexString(cell[i])).append("\n");
         }
+        return b.toString();
     }
 
     public void setCap(int cap) {

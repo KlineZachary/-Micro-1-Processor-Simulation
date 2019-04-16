@@ -22,10 +22,9 @@ public class Micro1Viewer {
 
     }
 
-    // Create frame and objects
+    // Create frame and objects //Edited by zach
     public Micro1Viewer() {
 
-        // Title //Edited by zach
         int width = 700, height = 840;
         JLabel title = new JLabel("Micro1 - Viewer", SwingConstants.CENTER);
         title.setForeground(Color.white);
@@ -168,7 +167,6 @@ public class Micro1Viewer {
                 path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
                 console.assemble(path);
                 break;
-
             case 2: // Compiler
                 path = JOptionPane.showInputDialog(button.getParent(),
                         "Enter the path to the File that you would like to compile:");
@@ -179,12 +177,17 @@ public class Micro1Viewer {
                 break;
             case 4:// Step //
                 try {
+                    //Ask how many steps and then step
                     createInputDialog();
 
                     // Update Registers after stepping
                     DisplayRegister.updateRegisters();
+
+                    //Notify user that program was terminated
                     JOptionPane.showMessageDialog(null, "Program Terminated");
                 } catch (Exception error) {
+
+                    //Notify user of error
                     JOptionPane.showMessageDialog(null, "Error steping through memory", "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -273,10 +276,8 @@ public class Micro1Viewer {
 
     // Dump memory to textArea
     public static void guiMemDump() {
-        int[] cells = console.getMemory().getCells();
-        for (int i = 0; i < console.getMemory().getCap(); i++) {
-            textArea.append("cell[" + Integer.toHexString(i) + "] = " + Integer.toHexString(cells[i]) + "\n");
-        }
+        String dump = console.getMemory().dump();
+        textArea.setText(dump);
     }
 
     // Displays compiled var to textArea
