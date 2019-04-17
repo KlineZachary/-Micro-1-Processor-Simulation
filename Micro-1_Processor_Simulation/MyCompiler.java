@@ -378,14 +378,22 @@ public class MyCompiler {// Kevin
         return loadConst("goto" + Integer.toHexString(num), tempReg) + "if " + condReg + " " + tempReg + "\n";
     }
 
+    /**
+     * Converts infix as a string to postfix as a queue
+     * 
+     * @param expression The expression in the infix form
+     * @return The expression in the postfix form as a queue
+     * @throws Exception Invalid expression. EX: unbalanced parenthesis
+     */
     public Queue<String> postFix(String expression) throws Exception {
         Queue<String> out = new LinkedList<>();
-        insert = new LinkedList<>();
-        Stack<String> operators = new Stack<>();
+        insert = new LinkedList<>();// Used to handle negative numbers. Allows extra num/operators to be inserted
+        Stack<String> operators = new Stack<>();// handles the operators in the correct order
         String prev = null;
-        while (index < expression.length() || !insert.isEmpty()) {
+        while (index < expression.length() || !insert.isEmpty()) {// while there are more characters in the expression
+                                                                  // or items to be inserted
             String token = nextToken(expression);
-            if (isValued(token)) {
+            if (isValued(token)) {// constant or variable
                 out.add(token);
             } else if (token.equals("(")) {
                 operators.push(token);
