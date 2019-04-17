@@ -18,8 +18,7 @@ public class Micro1Viewer {
 
     // Main
     public static void main(String[] args) {
-        Micro1Viewer viewer = new Micro1Viewer();
-
+        new Micro1Viewer();
     }
 
     // Create frame and objects //Edited by zach
@@ -153,88 +152,75 @@ public class Micro1Viewer {
     // Button Actions
     static class Clicklistener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+
             Button button = (Button) (e.getSource());
-            String path;
+            String path, input;
             // Zach=============
-            switch (button.tag) {
-            case 0:// machine code
+            try {
 
-                path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
-                console.load(path);
+                switch (button.tag) {
+                case 0:// machine code
 
-                break;
-            case 1:// assembly code
-                path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
-                console.assemble(path);
-                break;
-            case 2: // Compiler
-                path = JOptionPane.showInputDialog(button.getParent(),
-                        "Enter the path to the File that you would like to compile:");
-                console.compile(path);
-                break;
-            case 3:// Empty Text
-                textArea.setText("");
-                break;
-            case 4:// Step //
-                try {
-                    //Ask how many steps and then step
+                    path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
+                    console.load(path);
+
+                    break;
+                case 1:// assembly code
+                    path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
+                    console.assemble(path);
+                    break;
+                case 2: // Compiler
+                    path = JOptionPane.showInputDialog(button.getParent(),
+                            "Enter the path to the File that you would like to compile:");
+                    console.compile(path);
+                    break;
+                case 3:// Empty Text
+                    textArea.setText("");
+                    break;
+                case 4:// Step //
+
+                    // Ask how many steps and then step through
                     createInputDialog();
 
                     // Update Registers after stepping
                     DisplayRegister.updateRegisters();
 
-                    //Notify user that program was terminated
-                    JOptionPane.showMessageDialog(null, "Program Terminated");
-                } catch (Exception error) {
+                    break;
+                case 5:// Memory dumps to textArea
+                    textArea.setText(console.getMemory().dump());
+                    break;
+                case 6: // out
 
-                    //Notify user of error
-                    JOptionPane.showMessageDialog(null, "Error steping through memory", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-
-                break;
-            case 5:// Memory dumps
-                guiMemDump();
-                break;
-            case 6: // out
-                try {
-                    String input = JOptionPane.showInputDialog(button.getParent(),
+                    input = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the var name you would like to print");
-                    guiPrint(input);
-                } catch (Exception error) {
-                    JOptionPane.showMessageDialog(null, "Error printing variable", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                break;
-            case 7: // arr
-                try {
-                    String input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
+                    printVar(input);
+
+                    break;
+                case 7: // arr
+                    input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
                     int sizeInput = (Integer.parseInt(JOptionPane.showInputDialog(button.getParent(),
                             "Enter the number of elements you would like to see")));
-                    guiPrintArr(input, sizeInput);
-                } catch (Exception error) {
-                    JOptionPane.showMessageDialog(null, "Error printing array value", "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    textArea.setText(console.getArr(input, sizeInput));
+                    break;
+                case 8: // all
+
+                    printAll();
+
+                    break;
+                case 9:// Help //Edited by Chris
+                    JOptionPane.showMessageDialog(null,
+                            "Built for Computer Organization class taught by Dr. Zhu\nDeveloped By: Zachary A. Kline, Kevin Chevalier, and Christopher Aranda\n\n"
+                                    + "Help Catalog:\n\nMC: Loads a Machine Code File\nASM: Loads an assembly file\nCMP: Loads a compiler\n✄: Empty text\n"
+                                    + "⤻: Step\n⤹: Dumps memory into text field\nOUT: Displays the compiled variables\nARR: Displays the compiled array\nALL: Displays all compiled variables\n",
+                            "The Micro-1 Processor Simulation", JOptionPane.INFORMATION_MESSAGE);
+                    ;
+                    break;
+                case 11: // Quit
+                    frame.dispose();
+                    break;
                 }
-                break;
-            case 8: // all
-                try {
-                    guiPrintAll();
-                } catch (Exception error) {
-                    JOptionPane.showMessageDialog(null, "Error printing all compiled variables", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-                break;
-            case 9:// Help //Edited by Chris
-                JOptionPane.showMessageDialog(null,
-                        "Built for Computer Organization class taught by Dr. Zhu\nDeveloped By: Zachary A. Kline, Kevin Chevalier, and Christopher Aranda\n\n"
-                                + "Help Catalog:\n\nMC: Loads a Machine Code File\nASM: Loads an assembly file\nCMP: Loads a compiler\n✄: Empty text\n"
-                                + "⤻: Step\n⤹: Dumps memory into text field\nOUT: Displays the compiled variables\nARR: Displays the compiled array\nALL: Displays all compiled variables\n",
-                        "The Micro-1 Processor Simulation", JOptionPane.INFORMATION_MESSAGE);
-                ;
-                break;
-            case 11: // Quit
-                frame.dispose();
-                break;
+            } catch (Exception error) {
+                JOptionPane.showMessageDialog(null, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             // =============
 
@@ -250,22 +236,21 @@ public class Micro1Viewer {
     public static void createInputDialog() throws Exception {
         String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
         int numSteps = Integer.parseInt(userInput);
-        if (!guiStep(numSteps))
+        if (!step(numSteps))
             ; // break
-
     }
 
     /**
      * Step through and tell user when program is terminated
      */
 
-    public static boolean guiStep(int numSteps) throws Exception {
+    public static boolean step(int numSteps) throws Exception {
         boolean halt = false;
         for (int i = 0; i < numSteps && !halt; i++) {
             if (!halt) {
                 halt = console.getCPU().step(); // Something seems to be wrong here?
             } else {
-                System.out.println("program terminated");
+
                 return false;
             }
         }
@@ -274,14 +259,8 @@ public class Micro1Viewer {
         // ===========================================
     }
 
-    // Dump memory to textArea
-    public static void guiMemDump() {
-        String dump = console.getMemory().dump();
-        textArea.setText(dump);
-    }
-
     // Displays compiled var to textArea
-    public static void guiPrint(String var) throws Exception {
+    public static void printVar(String var) throws Exception {
         if (console.getCompiler() == null) {
             JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (console.getCompiler().containsVariable(var)) {
@@ -292,21 +271,7 @@ public class Micro1Viewer {
         }
     }
 
-    // Displays elements in array
-    public static void guiPrintArr(String var, int len) throws Exception {
-        if (console.getCompiler() == null) {
-            JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (console.getCompiler().containsVariable(var)) {
-            for (int i = 0; i < len; i++) {
-                textArea.append(var + "[" + i + "]="
-                        + console.getMemory().read(console.getCompiler().getVariable(var) + i) + "\n");
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Variable does not exist", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    public static void guiPrintAll() throws Exception {
+    public static void printAll() throws Exception {
         if (console.getCompiler() == null) {
             JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
         } else {

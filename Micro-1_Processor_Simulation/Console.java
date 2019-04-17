@@ -48,19 +48,17 @@ public class Console {
 	 * 
 	 * @param fName the name of a file containing hex numbers
 	 */
-	public void load(String fName) {
-		try {
-			File f = new File(fName);
-			Scanner scan = new Scanner(f);
-			int address = 0;
-			while (scan.hasNext()) {
-				memory.write(address++, scan.nextInt(16));
-			}
-			cpu.setPC(0);
-			scan.close();
-		} catch (Exception e) {
-			System.out.println(e);
+	public void load(String fName) throws Exception {
+
+		File f = new File(fName);
+		Scanner scan = new Scanner(f);
+		int address = 0;
+		while (scan.hasNext()) {
+			memory.write(address++, scan.nextInt(16));
 		}
+		cpu.setPC(0);
+		scan.close();
+
 	}
 
 	/**
@@ -70,7 +68,7 @@ public class Console {
 	 */
 	// Kevin==============================================
 
-	public void assemble(String fName) {
+	public void assemble(String fName) throws Exception {
 		String current = "";
 		try {
 			File f = new File(fName);
@@ -114,22 +112,26 @@ public class Console {
 				current = instr + " " + Integer.toHexString(a) + " " + Integer.toHexString(b);
 				// System.out.println(address + ". " + instr + " " + a + " " + b);
 				memory.write(address++, assembler.translate(instr, a, b));
+				if (address >= memory.getCap()) {
+					throw new Exception("Out of Memory");
+				}
 			}
 			cpu.setPC(0);
 			scan.close();
 			System.out.println("Assembled successfully");
 		} catch (Exception e) {
-			System.out.println("ASM Error: " + e.getMessage() + " with line '" + current + "'");
+			throw new Exception("ASM Error: " + e.getMessage() + " with line '" + current + "'");
 		}
 	}
 
-	public void compile(String fName) {
+	public void compile(String fName) throws Exception {
 		int lineNumber = 0;
 		String line = "";
+		File f = new File(fName);
+		StringBuilder b = new StringBuilder();
+
 		try {
-			File f = new File(fName);
 			Scanner scan = new Scanner(f);
-			StringBuilder b = new StringBuilder();
 			compiler = new MyCompiler(memory.getCap());
 			while (scan.hasNext()) {
 				b.append(scan.nextLine());
@@ -170,16 +172,16 @@ public class Console {
 			}
 			b.append("halt");
 			System.out.println("Compiled successfully");
-			String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm";
-			// String asmName = "assembled.assm";
-			PrintWriter writer = new PrintWriter(asmName);
-			writer.println(b.toString());
-			writer.close();
-			assemble(asmName);
+
 		} catch (Exception e) {
-			System.out.println("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
-			// e.printStackTrace();
+			throw new Exception("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
 		}
+		String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm";
+		// String asmName = "assembled.assm";
+		PrintWriter writer = new PrintWriter(asmName);
+		writer.println(b.toString());
+		writer.close();
+		assemble(asmName);
 	}
 
 	public void print(String var) throws Exception {
@@ -192,21 +194,22 @@ public class Console {
 		}
 	}
 
-	public void printArr(String var, int len) throws Exception {
-		if (compiler == null) {
-			System.out.println("No file was compiled");
-		} else if (compiler.containsVariable(var)) {
-			StringBuilder out = new StringBuilder();
-			out.append(var).append("=[");
-			if (len > 0)
-				out.append(memory.read(compiler.getVariable(var)));
-			for (int i = 1; i < len; i++) {
-				out.append("," + memory.read(compiler.getVariable(var) + i));
-			}
-			System.out.println(out.append("]").toString());
-		} else {
-			System.out.println("Variable does not exist");
+	public String getArr(String var, int len) throws Exception {
+		if (compiler == null)
+			throw new Exception("No file was compiled");
+
+		if (!compiler.containsVariable(var)) {
+			throw new Exception("Variable does not exist");
 		}
+		StringBuilder out = new StringBuilder();
+		out.append(var).append("=[");
+		if (len > 0)
+			out.append(memory.read(compiler.getVariable(var)));
+		for (int i = 1; i < len; i++) {
+			out.append("," + memory.read(compiler.getVariable(var) + i));
+		}
+		return out.append("]").toString();
+
 	}
 
 	public void printAll() throws Exception {
@@ -303,7 +306,8 @@ public class Console {
 					compile(kbd.next());
 					System.out.println("done");
 				} else if (cmmd.equals("memory")) {
-					memory.dump();
+					String dump = memory.dump();
+					System.out.println(dump);
 				} else if (cmmd.equals("registers")) {
 					cpu.dump();
 				} else if (cmmd.equals("step")) {
@@ -318,7 +322,7 @@ public class Console {
 						System.out.println("not a valid length");
 						kbd.nextLine();
 					} else {
-						printArr(var, kbd.nextInt());
+						System.out.println(getArr(var, kbd.nextInt()));
 					}
 				} else if (cmmd.equals("allout")) {
 					printAll();
@@ -328,7 +332,7 @@ public class Console {
 						kbd.nextLine();
 				}
 			} catch (Exception e) {
-				System.out.println("Error: " + e.getMessage());
+				System.out.println(e.getMessage());
 			}
 		}
 		System.out.println("Bye! Drink tea, take a warm shower, don't stress, and get a good night's sleep.");
