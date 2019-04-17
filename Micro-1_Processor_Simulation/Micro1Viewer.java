@@ -6,12 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.io.*;
 
 public class Micro1Viewer {
 
     // Vars
-    static Console console = new Console();
+    static Console console = new Console(1024);
     static JTextArea textArea = new JTextArea(5, 20);
 
     static JFrame frame = new JFrame(); // creating instance of JFrame
@@ -23,6 +22,7 @@ public class Micro1Viewer {
 
     // Create frame and objects //Edited by zach
     public Micro1Viewer() {
+        
 
         int width = 700, height = 840;
         JLabel title = new JLabel("Micro1 - Viewer", SwingConstants.CENTER);
@@ -32,10 +32,9 @@ public class Micro1Viewer {
         frame.add(title);
 
         // Buttons //Edited by zach
-        String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "?", "X" };
+        String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "?" };
         String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step",
-                "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars", "Help",
-                "Quit" };
+                "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars", "Help" };
         Button.loadListener();
         Button.addAll(titles, tooltips, frame);
 
@@ -56,6 +55,7 @@ public class Micro1Viewer {
         frame.setSize(width, height);
         frame.setLayout(null);// using no layout managers
         frame.setVisible(true);// making the frame visible
+
     }
 
     // ??
@@ -97,7 +97,7 @@ public class Micro1Viewer {
         static void addAll(String[] titles, String[] tooltips, JFrame frame) {
             for (int i = 0; i < titles.length; i++) {
                 // Create new row of buttons
-                if (i % 5 == 0) {
+                if (i % 6 == 0) {
                     y += 50;
                     x = constantX;
                 }
@@ -160,10 +160,8 @@ public class Micro1Viewer {
 
                 switch (button.tag) {
                 case 0:// machine code
-
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
                     console.load(path);
-
                     break;
                 case 1:// assembly code
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
@@ -189,23 +187,20 @@ public class Micro1Viewer {
                 case 5:// Memory dumps to textArea
                     textArea.setText(console.getMemory().dump());
                     break;
-                case 6: // out
-
+                case 6: // prints out variable as chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the var name you would like to print");
-                    printVar(input);
+                    textArea.setText(console.print(input ));
 
                     break;
-                case 7: // arr
+                case 7: // prints out array and length that is chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
                     int sizeInput = (Integer.parseInt(JOptionPane.showInputDialog(button.getParent(),
                             "Enter the number of elements you would like to see")));
                     textArea.setText(console.getArr(input, sizeInput));
                     break;
-                case 8: // all
-
-                    printAll();
-
+                case 8: // print all variables
+                    textArea.setText(console.printAll());;
                     break;
                 case 9:// Help //Edited by Chris
                     JOptionPane.showMessageDialog(null,
@@ -214,9 +209,6 @@ public class Micro1Viewer {
                                     + "⤻: Step\n⤹: Dumps memory into text field\nOUT: Displays the compiled variables\nARR: Displays the compiled array\nALL: Displays all compiled variables\n",
                             "The Micro-1 Processor Simulation", JOptionPane.INFORMATION_MESSAGE);
                     ;
-                    break;
-                case 11: // Quit
-                    frame.dispose();
                     break;
                 }
             } catch (Exception error) {
@@ -259,29 +251,8 @@ public class Micro1Viewer {
         // ===========================================
     }
 
-    // Displays compiled var to textArea
-    public static void printVar(String var) throws Exception {
-        if (console.getCompiler() == null) {
-            JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (console.getCompiler().containsVariable(var)) {
-            textArea.setText(var + "=" + console.getMemory().read(console.getCompiler().getVariable(var)));
-        } else {
-            JOptionPane.showMessageDialog(null, "Variable does not exist", "Error", JOptionPane.ERROR_MESSAGE);
-
-        }
-    }
-
-    public static void printAll() throws Exception {
-        if (console.getCompiler() == null) {
-            JOptionPane.showMessageDialog(null, "No file was compiled", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            Iterator<String> vars = console.getCompiler().getAllVariables().iterator();
-            while (vars.hasNext()) {
-                String var = vars.next();
-                textArea.append(var + "=" + console.getMemory().read(console.getCompiler().getVariable(var)) + "\n");
-            }
-        }
-    }
+    
+        //Cleaned up code so all the methods there were here arent needed feels like spring cleaning :)
 
     // ===========================================
 }

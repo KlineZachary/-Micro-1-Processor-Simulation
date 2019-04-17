@@ -184,16 +184,32 @@ public class Console {
 		assemble(asmName);
 	}
 
-	public void print(String var) throws Exception {
+
+	/**
+	 * This prints out the variable and its variable as requested by the user
+	 * @param var
+	 * @return variable.toString() this is the final format of the variable to use to print
+	 * @throws Exception
+	 */
+	public String print(String var) throws Exception {
+		StringBuilder variable = new StringBuilder("");		
 		if (compiler == null) {
 			System.out.println("No file was compiled");
 		} else if (compiler.containsVariable(var)) {
-			System.out.println(var + "=" + memory.read(compiler.getVariable(var)));
+			variable.append(var + "=" + memory.read(compiler.getVariable(var)));
 		} else {
 			System.out.println("Variable does not exist");
 		}
-	}
 
+		return variable.toString();
+	}
+	/**
+	 * Prints the specified array and length as given by the user
+	 * @param var
+	 * @param len
+	 * @return out.append("]").toString() this is the final format of the array
+	 * @throws Exception
+	 */
 	public String getArr(String var, int len) throws Exception {
 		if (compiler == null)
 			throw new Exception("No file was compiled");
@@ -212,16 +228,24 @@ public class Console {
 
 	}
 
-	public void printAll() throws Exception {
+	/**
+	 * Prints out all variables
+	 * @return all.toString() this is the final format of printing all vars
+	 * @throws Exception
+	 */
+	public String printAll() throws Exception {
+		StringBuilder all = new StringBuilder("");
 		if (compiler == null) {
 			System.out.println("No file was compiled");
 		} else {
 			Iterator<String> vars = compiler.getAllVariables().iterator();
 			while (vars.hasNext()) {
 				String var = vars.next();
-				System.out.println(var + "=" + memory.read(compiler.getVariable(var)));
+				all.append(var + "=" + memory.read(compiler.getVariable(var)) + "\n");
 			}
 		}
+
+		return all.toString();
 	}
 	// ==============================================
 
@@ -315,7 +339,7 @@ public class Console {
 						// break;
 					}
 				} else if (cmmd.equals("out")) {
-					print(kbd.next());
+					System.out.println(print(kbd.next()));
 				} else if (cmmd.equals("arr")) {
 					String var = kbd.next();
 					if (!kbd.hasNextInt()) {
@@ -325,7 +349,7 @@ public class Console {
 						System.out.println(getArr(var, kbd.nextInt()));
 					}
 				} else if (cmmd.equals("allout")) {
-					printAll();
+					System.out.println(printAll());
 				} else {
 					System.out.println("unrecognized command: " + cmmd);
 					if (kbd.hasNext())
