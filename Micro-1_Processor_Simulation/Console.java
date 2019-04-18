@@ -206,7 +206,7 @@ public class Console {
 		if (!compiler.containsVariable(var))
 			throw new Exception("Variable does not exist");
 		StringBuilder variable = new StringBuilder("");
-		variable.append(var + "=" + memory.read(compiler.getVariable(var)));
+		variable.append(var + "=" + memory.read(compiler.getAddress(var)));
 		return variable.toString();
 	}
 
@@ -226,9 +226,9 @@ public class Console {
 		StringBuilder out = new StringBuilder();
 		out.append(var).append("=[");
 		if (len > 0)
-			out.append(memory.read(compiler.getVariable(var)));
+			out.append(memory.read(compiler.getAddress(var)));
 		for (int i = 1; i < len; i++) {
-			out.append("," + memory.read(compiler.getVariable(var) + i));
+			out.append("," + memory.read(compiler.getAddress(var) + i));
 		}
 		return out.append("]").toString();
 
@@ -243,13 +243,13 @@ public class Console {
 	public String printAll() throws Exception {
 		if (compiler == null)
 			throw new Exception("no file was compiled");
-		if (compiler.variables.isEmpty())
+		if (!compiler.hasVariables())
 			throw new Exception("no variables found");
 		StringBuilder all = new StringBuilder("");
 		Iterator<String> vars = compiler.getAllVariables().iterator();
 		while (vars.hasNext()) {
 			String var = vars.next();
-			all.append(var + "=" + memory.read(compiler.getVariable(var)) + "\n");
+			all.append(var + "=" + memory.read(compiler.getAddress(var)) + "\n");
 		}
 		return all.toString();
 
@@ -369,10 +369,6 @@ public class Console {
 		System.out.println("Bye! Drink tea, take a warm shower, don't stress, and get a good night's sleep.");
 	}
 
-	/**
-	 * Creates a console (with memory and CPU), then starts the console's control
-	 * loop.
-	 */
 	public static void main(String[] args) {
 		Console console = new Console(1024);
 		console.controlLoop();

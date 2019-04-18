@@ -6,19 +6,21 @@ import java.util.*;
 
 public class MyCompiler {// Kevin
 
-    String[] reservedWords = { "if", "while", "end", "goto", "label", "halt" };// illegal variable names that are used
-                                                                               // as commands
-    HashMap<String, Integer> variables = new HashMap<>();// Look up table for variable
-    Stack<Integer> jumpStack = new Stack<>();// manages the goto - label pairs
-    int jumpCount = 1;// labels are identified by a num. This var tracks the current jump number
-    int stackPointer;// pointer that starts at the bottom of the memory. Holds variable/array data +
-                     // functions as a stack for push/pop
+    private String[] reservedWords = { "if", "while", "end", "goto", "label", "halt" };// illegal variable names that
+                                                                                       // are used
+    // as commands
+    private HashMap<String, Integer> variables = new HashMap<>();// Look up table for variable
+    private Stack<Integer> jumpStack = new Stack<>();// manages the goto - label pairs
+    private int jumpCount = 1;// labels are identified by a num. This var tracks the current jump number
+    private int stackPointer;// pointer that starts at the bottom of the memory. Holds variable/array data +
+    // functions as a stack for push/pop
 
-    int index = 0;// char index of the line being currently parsed
-    boolean isExpectingBool = false;// after a while/if statement. The following statement will be used as a bool to
-                                    // determine if should jump
-    Queue<String> insert;// Used to handle negative numbers. Allows extra num/operators to be inserted
-                         // during postfix()
+    private int index = 0;// char index of the line being currently parsed
+    private boolean isExpectingBool = false;// after a while/if statement. The following statement will be used as a
+                                            // bool to
+    // determine if should jump
+    private Queue<String> insert;// Used to handle negative numbers. Allows extra num/operators to be inserted
+    // during postfix()
 
     /**
      * Parses a high level line of code recursively and the stores the result in the
@@ -220,7 +222,7 @@ public class MyCompiler {// Kevin
      * @param tempReg A temporary register for computations
      * @return Multiline assembly code to store the value to memory
      * @throws Exception Exception if the high level code is invalid. Ex: Unbalanced
-     *                   []
+     *                   brackets
      */
     public String saveVar(String var, int reg, int tempReg) throws Exception {
         StringBuilder out = new StringBuilder();
@@ -372,10 +374,10 @@ public class MyCompiler {// Kevin
      * @return The address in memory in hex
      */
     public String addressAsHex(String var) throws Exception {
-        if (variables.get(var) == null) {
+        if (!containsVariable(var)) {
             throw new Exception("variable " + var + " was not initialized");
         }
-        return Integer.toHexString(variables.get(var));
+        return Integer.toHexString(getAddress(var));
     }
 
     /**
@@ -632,93 +634,228 @@ public class MyCompiler {// Kevin
     }
 
     /**
+     * Assembly code for adding two values in registers
      * 
-     * @param regA
-     * @param regB
-     * @return
+     * @param regA The register that holds the first value
+     * @param regB The register that holds the second value
+     * @return The assembly code for adding two registers
      */
     public String add(int regA, int regB) {
         return "add " + regA + " " + regB + "\n";
     }
 
+    /**
+     * Assembly code for subtracting two values in registers
+     * 
+     * @param regA The register that holds the first value
+     * @param regB The register that holds the second value
+     * @return The assembly code for subtracting two registers
+     */
     public String sub(int regA, int regB) {
         return "sub " + regA + " " + regB + "\n";
     }
 
+    /**
+     * Assembly code for oring two values in registers
+     * 
+     * @param regA The register that holds the first value
+     * @param regB The register that holds the second value
+     * @return The assembly code for oring two registers
+     */
     public String or(int regA, int regB) {
         return "or " + regA + " " + regB + "\n";
     }
 
+    /**
+     * Assembly code for bitwise oring two values in registers
+     * 
+     * @param regA The register that holds the first value
+     * @param regB The register that holds the second value
+     * @return The assembly code for bitwise oring two registers
+     */
     public String bitOr(int regA, int regB) {
         return "bwd " + regA + " " + regB + "\n";
     }
 
+    /**
+     * Assembly code for anding two values in registers
+     * 
+     * @param regA The register that holds the first value
+     * @param regB The register that holds the second value
+     * @return The assembly code for anding two registers
+     */
     public String and(int regA, int regB) {
         return "and " + regA + " " + regB + "\n";
     }
 
+    /**
+     * Toogles a boolean in a register
+     * 
+     * @param reg The register that holds the obolean
+     * @return The assembly code for noting the register
+     */
     public String not(int reg) {
         return not(reg, reg);
     }
 
+    /**
+     * Toggles a boolean in a register and stores it in another register
+     * 
+     * @param ansReg The register that stores the result
+     * @param reg    The register that holds the inital value
+     * @return The assembly code for noting a value to a register
+     */
     public String not(int ansReg, int reg) {
         return "not " + ansReg + " " + reg + "\n";
     }
 
+    /**
+     * Move the value from a register to another register
+     * 
+     * @param regA The source register
+     * @param regB The destination register
+     * @return The assembly code for moving the value
+     */
     public String move(int regA, int regB) {
         return loadConst(0, regB) + add(regB, regA);
     }
 
+    /**
+     * Determines if a register is greater than another register and stores the
+     * result in regA
+     * 
+     * @param regA The register for comparision and storing the result
+     * @param regB The register for comparsion
+     * @return Assembly code that will store a value greater then 0 if comparsion is
+     *         true otherwise less then 1
+     */
     public String greaterThan(int regA, int regB) {// regB , regA need to be pushed in that order
-        return sub(regA, regB);
+        return sub(regA, regB);// a=a-b
     }
 
+    /**
+     * Determines if a register is less than another register and stores the result
+     * in regA
+     * 
+     * @param regA The register for comparision and storing the result
+     * @param regB The register for comparsion
+     * @return Assembly code that will store a value greater then 0 if comparsion is
+     *         true otherwise less then 1
+     */
     public String lessThan(int regA, int regB) {
-        return sub(regB, regA) + move(regB, regA);
+        return sub(regB, regA) + move(regB, regA);// a=b-a
     }
 
+    /**
+     * Determines if a register is equal to another register and stores the result
+     * in regA
+     * 
+     * @param regA The register for comparision and storing the result
+     * @param regB The register for comparsion
+     * @return Assembly code that will store a value greater then 0 if comparsion is
+     *         true otherwise less then 1
+     */
     public String equalTo(int regA, int regB) {
-        return greaterThan(regA, regB) + not(regA);
+        return greaterThan(regA, regB) + not(regA);// a=!(a-b)
     }
 
+    /**
+     * Determines if a register is not equal another register and stores the result
+     * in regA
+     * 
+     * @param regA The register for comparision and storing the result
+     * @param regB The register for comparsion
+     * @return Assembly code that will store a value greater then 0 if comparsion is
+     *         true otherwise less then 1
+     */
     public String notEqual(int regA, int regB) {
-        return equalTo(regA, regB) + not(regA);
+        return equalTo(regA, regB) + not(regA);// a=!!(a-b)//This works because either it is nonzero -> zero -> one or
+                                               // zero -> one -> zero
     }
 
+    /**
+     * Determines if a register is less than or equal toanother register and stores
+     * the result in regA
+     * 
+     * @param regA The register for comparision and storing the result
+     * @param regB The register for comparsion
+     * @return Assembly code that will store a value greater then 0 if comparsion is
+     *         true otherwise less then 1
+     */
     public String lessEqual(int regA, int regB) {
         StringBuilder out = new StringBuilder();
-        out.append(lessThan(regA, regB));
+        out.append(lessThan(regA, regB));// if regA < regB ? regA > 0 else regA <= 0
         out.append(loadConst(1, regB));
-        out.append(bitOr(regA, regB));
+        out.append(bitOr(regA, regB));// (+ -> + or - -> - or 0 -> +)
         return out.toString();
     }
 
+    /**
+     * Determines if a register is greater than or equal another register and stores
+     * the result in regA
+     * 
+     * @param regA The register for comparision and storing the result
+     * @param regB The register for comparsion
+     * @return Assembly code that will store a value greater then 0 if comparsion is
+     *         true otherwise less then 1
+     */
     public String greaterEqual(int regA, int regB) {
         StringBuilder out = new StringBuilder();
-        out.append(greaterThan(regA, regB));
+        out.append(greaterThan(regA, regB));// if regA > regB ? regA > 0 else regA <= 0
         out.append(loadConst(1, regB));
-        out.append(bitOr(regA, regB));
+        out.append(bitOr(regA, regB));// (+ -> + or - -> - or 0 -> +)
         return out.toString();
     }
 
+    /**
+     * Dedicates a length of space of memory for a variable and stores the address.
+     * 
+     * @param var  The name of variable to store
+     * @param size The size of the space to dedicate. Standard variables are 1.
+     *             Arrays can be any valid length.
+     * @throws Exception The name of variable is invalid
+     */
     public void insertVariable(String var, int size) throws Exception {
         if (isReserved(var) || !var.matches("[a-zA-Z]+[a-zA-Z0-9]*"))
             throw new Exception("'" + var + "' is not a valid variable");
         variables.put(var, stackPointer -= size);
     }
 
+    /**
+     * Checks if the variable has been stored in memory
+     * 
+     * @param var The name of variable in check
+     * @return //true if the variable has been added otherwise false
+     */
     public boolean containsVariable(String var) {
         return variables.containsKey(var);
     }
 
-    public int getVariable(String var) {
+    /**
+     * Get the address of a variable as a base 10 int
+     * 
+     * @param var The name of variable
+     * @return The address as a base 10 int
+     */
+    public int getAddress(String var) {
         return variables.get(var);
     }
 
+    /**
+     * Retrieves all the names of the variables in a set
+     * 
+     * @return The names of all the variables
+     */
     public Set<String> getAllVariables() {
         return variables.keySet();
     }
 
+    /**
+     * Checks if the variable name is also a reserved word
+     * 
+     * @param var The name of variable in check
+     * @return true if the name is reserved, otherwise false
+     */
     public boolean isReserved(String var) {
         for (String reserve : reservedWords) {
             if (var.equals(reserve)) {
@@ -728,37 +865,61 @@ public class MyCompiler {// Kevin
         return false;
     }
 
+    /**
+     * Verifies if any variables have been inserted
+     * 
+     * @return true if a variable exists, otherwise false
+     */
+    public boolean hasVariables() {
+        return !variables.isEmpty();
+    }
+
+    /**
+     * Pushes the value in reg to the stack
+     * 
+     * @param reg     The register that holds the value
+     * @param tempReg A temporary register to complete the process
+     * @return Multiline assembly code to push the value from the register to the
+     *         stack
+     */
     public String push(int reg, int tempReg) {
         StringBuilder out = new StringBuilder();
-        out.append(loadConst(--stackPointer, tempReg));
+        out.append(loadConst(--stackPointer, tempReg));// get address in the stack
         out.append(store(tempReg, reg));
         return out.toString();
     }
 
+    /**
+     * Retrieve the value from the stack to a reg
+     * 
+     * @param reg The register that stores the value
+     * @return Multiline assembly code to pull the value from the stack to the
+     *         register
+     */
     public String pop(int reg) {
         StringBuilder out = new StringBuilder();
-        out.append(loadConst(stackPointer++, reg));
+        out.append(loadConst(stackPointer++, reg));// move the address to the next position
         out.append("load ").append(reg).append(" ").append(reg).append("\n");
         return out.toString();
     }
 
+    /**
+     * Verifies that the compiler isn't expecting any additional elements
+     * 
+     * @throws Exception if the if/while statement didn't close
+     */
     public void close() throws Exception {
         if (!jumpStack.isEmpty()) {
             throw new Exception("expected 'end'");
         }
     }
 
+    /**
+     * Creates a compiler
+     * 
+     * @param stackPointer The address for the top of the stack in memory
+     */
     public MyCompiler(int stackPointer) {
         this.stackPointer = stackPointer;
-    }
-
-    public static void main(String[] args) throws Exception {
-        MyCompiler compile = new MyCompiler(256);
-        String[] vars = { "c" };
-        int i = 255;
-        for (String var : vars)
-            compile.variables.put(var, i--);
-
-        System.out.println("RESULTS:\n" + compile.evaluate("c=7+3-2", 0, 1));
     }
 }
