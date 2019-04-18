@@ -129,17 +129,22 @@ public class Console {
 		String line = "";
 		File f = new File(fName);
 		StringBuilder b = new StringBuilder();
-
 		try {
+
 			Scanner scan = new Scanner(f);
 			compiler = new MyCompiler(memory.getCap());
 			while (scan.hasNext()) {
-				b.append(scan.nextLine());
+				line = scan.nextLine().replaceAll("\\s+", "");
+				if (line.length() > 0) {
+					if (!line.endsWith(";"))
+						throw new Exception("missing ';'");
+					if ((line.matches(".*[0-9a-zA-Z\\[\\]] [0-9a-zA-Z\\[\\]].*")))
+						throw new Exception("missing operator");
+					b.append(line);
+				}
 			}
 			scan.close();
-
-			String[] lines = b.toString().replaceAll("\\s+", "").replace("true", "1").replace("false", "0").split(";");
-
+			String[] lines = b.toString().replace("true", "1").replace("false", "0").split(";");
 			b = new StringBuilder();
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
@@ -171,9 +176,11 @@ public class Console {
 				lineNumber++;
 			}
 			b.append("halt");
+			compiler.close();
 			System.out.println("Compiled successfully");
 
 		} catch (Exception e) {
+			// e.printStackTrace();
 			throw new Exception("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
 		}
 		String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm";
@@ -184,27 +191,28 @@ public class Console {
 		assemble(asmName);
 	}
 
-
 	/**
 	 * This prints out the variable and its variable as requested by the user
+	 * 
 	 * @param var
-	 * @return variable.toString() this is the final format of the variable to use to print
-	 * @throws Exception
+	 * @return variable.toString() this is the final format of the variable to use
+	 *         to print
+	 * @throws Exception the file was not compiled so variables do not exist or the
+	 *                   variable is not valid
 	 */
 	public String print(String var) throws Exception {
-		StringBuilder variable = new StringBuilder("");		
-		if (compiler == null) {
-			System.out.println("No file was compiled");
-		} else if (compiler.containsVariable(var)) {
-			variable.append(var + "=" + memory.read(compiler.getVariable(var)));
-		} else {
-			System.out.println("Variable does not exist");
-		}
-
+		if (compiler == null)
+			throw new Exception("No file was compiled");
+		if (!compiler.containsVariable(var))
+			throw new Exception("Variable does not exist");
+		StringBuilder variable = new StringBuilder("");
+		variable.append(var + "=" + memory.read(compiler.getVariable(var)));
 		return variable.toString();
 	}
+
 	/**
 	 * Prints the specified array and length as given by the user
+	 * 
 	 * @param var
 	 * @param len
 	 * @return out.append("]").toString() this is the final format of the array
@@ -213,10 +221,8 @@ public class Console {
 	public String getArr(String var, int len) throws Exception {
 		if (compiler == null)
 			throw new Exception("No file was compiled");
-
-		if (!compiler.containsVariable(var)) {
+		if (!compiler.containsVariable(var))
 			throw new Exception("Variable does not exist");
-		}
 		StringBuilder out = new StringBuilder();
 		out.append(var).append("=[");
 		if (len > 0)
@@ -230,22 +236,23 @@ public class Console {
 
 	/**
 	 * Prints out all variables
+	 * 
 	 * @return all.toString() this is the final format of printing all vars
 	 * @throws Exception
 	 */
 	public String printAll() throws Exception {
+		if (compiler == null)
+			throw new Exception("no file was compiled");
+		if (compiler.variables.isEmpty())
+			throw new Exception("no variables found");
 		StringBuilder all = new StringBuilder("");
-		if (compiler == null) {
-			System.out.println("No file was compiled");
-		} else {
-			Iterator<String> vars = compiler.getAllVariables().iterator();
-			while (vars.hasNext()) {
-				String var = vars.next();
-				all.append(var + "=" + memory.read(compiler.getVariable(var)) + "\n");
-			}
+		Iterator<String> vars = compiler.getAllVariables().iterator();
+		while (vars.hasNext()) {
+			String var = vars.next();
+			all.append(var + "=" + memory.read(compiler.getVariable(var)) + "\n");
 		}
-
 		return all.toString();
+
 	}
 	// ==============================================
 
@@ -270,8 +277,8 @@ public class Console {
 		int num;
 		if (!kbd.hasNextInt()) {
 			num = 0;
-			kbd.nextLine();
-			System.out.println("invalid number of steps");
+			kbd.next();
+			throw new Exception("invalid number of steps");
 		} else {
 			num = kbd.nextInt();
 			boolean halt = false;
@@ -344,7 +351,7 @@ public class Console {
 					String var = kbd.next();
 					if (!kbd.hasNextInt()) {
 						System.out.println("not a valid length");
-						kbd.nextLine();
+						kbd.next();
 					} else {
 						System.out.println(getArr(var, kbd.nextInt()));
 					}

@@ -40,12 +40,21 @@ public class MyCompiler {// Kevin
         if (line.equals("halt")) {
             out.append("halt\n");
         } else if (line.equals("if")) {
+            if (isExpectingBool)
+                throw new Exception("missing condition for statement");
             isExpectingBool = true;
         } else if (line.equals("while")) {// creating label, adding num to stack for goto
+            if (isExpectingBool)
+                throw new Exception("missing condition for statement");
             isExpectingBool = true;
             jumpStack.push(-jumpCount);// neg number means that it sneeds a goto
             out.append(addLabel(jumpCount++));// add a label: check cond again after code runs
         } else if (line.equals("end")) {// end of while or if
+            if (isExpectingBool)
+                throw new Exception("missing condition for statement");
+            if (jumpStack.isEmpty()) {
+                throw new Exception("Missing condition for jump statement");
+            }
             int labelAddr = jumpStack.pop();// label when cond fail. This is popped here but added below to invert order
                                             // of stack
             if (!jumpStack.isEmpty() && jumpStack.peek() < 0) {// Check if pair was for a while statement
@@ -128,14 +137,19 @@ public class MyCompiler {// Kevin
      */
     public String handleExpression(String expression, int reg, int tempReg) throws Exception {
         StringBuilder out = new StringBuilder();
-        index = 0;// Start looking at the expression from the first character
         Queue<String> q = postFix(expression);// goes through expression and returns the post fix ordering
+        int pushCount = 0;
         while (!q.isEmpty()) {// go through all elements
             String token = q.poll();
+            // System.out.println("Token: " + token);
             if (isValued(token)) {// if the token is a variable or constant or array element EX: x,0,x[0]
                 out.append(load(token, reg, tempReg));// get value of token and load to reg (if var, get value of var)
                 out.append(push(reg, tempReg));// push value to stack
+                pushCount++;
             } else {// If the token is an operator
+                if ((pushCount -= 2) < 0) {
+                    throw new Exception("invalid syntax");
+                }
                 out.append(pop(tempReg));// get the previous two number to compute together from stack
                 out.append(pop(reg));
                 if (isComparsionOperator(token)) {// if it is a comparsion operator '==' or '<'...
@@ -145,10 +159,13 @@ public class MyCompiler {// Kevin
                     // handle op and store result in reg
                 }
                 out.append(push(reg, tempReg));// push result to the stack
-
+                pushCount++;
             }
         }
         out.append(pop(reg));// get the remaining value from stack as solution to reg
+        if (pushCount != 1) {
+            throw new Exception("invalid syntax");
+        }
         return out.toString();
 
     }
@@ -207,6 +224,7 @@ public class MyCompiler {// Kevin
      */
     public String saveVar(String var, int reg, int tempReg) throws Exception {
         StringBuilder out = new StringBuilder();
+        // System.out.println("SAVE VAR: " + var);
         if (isIndexed(var)) {// if the var is an array element
             String[] parts = divideIndexedVariable(var);// divide the variable into array and index expression
             var = parts[0];
@@ -317,8 +335,9 @@ public class MyCompiler {// Kevin
      * @param var The variable name to retrieve the address of
      * @param reg The register to load the address to
      * @return The multilined assembly code to load the address to the register
+     * @throws Exception Invalid variable access. EX: The variable does not exist
      */
-    public String loadAddress(String var, int reg) {
+    public String loadAddress(String var, int reg) throws Exception {
         return "loadc " + Integer.toHexString(reg) + "\n" + addressAsHex(var) + "\n";
     }
 
@@ -352,7 +371,10 @@ public class MyCompiler {// Kevin
      * @param var The variable name to get the address of
      * @return The address in memory in hex
      */
-    public String addressAsHex(String var) {
+    public String addressAsHex(String var) throws Exception {
+        if (variables.get(var) == null) {
+            throw new Exception("variable " + var + " was not initialized");
+        }
         return Integer.toHexString(variables.get(var));
     }
 
@@ -390,22 +412,28 @@ public class MyCompiler {// Kevin
         insert = new LinkedList<>();// Used to handle negative numbers. Allows extra num/operators to be inserted
         Stack<String> operators = new Stack<>();// handles the operators in the correct order
         String prev = null;
+        index = 0;// Start looking at the expression from the first character. Used in nextToken()
         while (index < expression.length() || !insert.isEmpty()) {// while there are more characters in the expression
                                                                   // or items to be inserted
             String token = nextToken(expression);
             if (isValued(token)) {// constant or variable
                 out.add(token);
-            } else if (token.equals("(")) {
+            } else if (token.equals("(")) {// start ()
                 operators.push(token);
-            } else if (token.equals(")")) {
+            } else if (token.equals(")")) {// found end of () -> search for (
+                if (operators.isEmpty()) {
+                    throw new Exception("expecting '('");
+                }
                 while (!operators.peek().equals("(")) {
                     out.add(operators.pop());
-                    if (operators.isEmpty())
-                        throw new Exception("Unbalanced parentheses");
+                    if (operators.isEmpty())// could not find (
+                        throw new Exception("expecting '('");
                 }
                 operators.pop();
 
             } else if (token.equals("-") && (prev == null || (isOperator(prev) && !prev.equals(")")))) {
+                // detecting - as negative numbers, instead of subtraction
+                // converting negative operator to a subtraction
                 insert.add("0");
                 insert.add("-");
             } else {
@@ -422,9 +450,9 @@ public class MyCompiler {// Kevin
             }
             prev = token;
         }
-        while (!operators.isEmpty()) {
+        while (!operators.isEmpty()) {// add any remaining operators
             if (operators.peek().equals("(")) {
-                throw new Exception("Unbalanced parentheses");
+                throw new Exception("Expecting ')'");
             }
             out.add(operators.pop());
 
@@ -432,8 +460,15 @@ public class MyCompiler {// Kevin
         return out;
     }
 
+    /**
+     * Determines the rank of an operator for postfix conversion
+     * 
+     * @param op The operator to determine rank
+     * @return The rank of the operator to compare with other operators
+     * @throws Exception Unknown operator
+     */
     public int precedence(String op) throws Exception {
-        switch (op) {
+        switch (op) {// Precedence is based on the Java Programming Language
         case "=":
             return 0;
         case "||":
@@ -471,6 +506,13 @@ public class MyCompiler {// Kevin
         }
     }
 
+    /**
+     * Retrieves the assembly command to the corresponding operator symbol
+     * 
+     * @param op The operator as a symbol
+     * @return The assembly command corresponding to the symbol
+     * @throws Exception Unknown operator
+     */
     public String getOperator(String op) throws Exception {
         switch (op) {
         case "+":
@@ -500,7 +542,17 @@ public class MyCompiler {// Kevin
         }
     }
 
-    public String handleComparsion(String op, int regA, int regB) {
+    /**
+     * Compares the value in two registers based on the comparsion operator and
+     * stores the result in the first register
+     * 
+     * @param op   The comparsion operator to compare the values
+     * @param regA The register that holds the first value and stores the result
+     * @param regB The register that holds the second value
+     * @return Multiline assembly code to compare the registers and store the result
+     * @throws Exception Unknown comparsion operator
+     */
+    public String handleComparsion(String op, int regA, int regB) throws Exception {
         switch (op) {
         case ">":
             return greaterThan(regA, regB);
@@ -515,47 +567,76 @@ public class MyCompiler {// Kevin
         case "!=":
             return notEqual(regA, regB);
         default:
-            return "halt";
+            throw new Exception("Unknown comparsion operator: " + op);
         }
     }
 
+    /**
+     * Determines if a string is an operator
+     * 
+     * @param s The operator, variable or constant that is being checked
+     * @return true - the string is an operator, otherwise - false
+     */
     public boolean isOperator(String s) {
         return s.matches("\\+|\\-|\\*|/|!|&&|\\|\\||<<|>>|&|\\||\\^|\\(|\\)") || isComparsionOperator(s);
     }
 
+    /**
+     * Determines if the string is a comparsion operator
+     * 
+     * @param s The operator, variable or constant that is being checked
+     * @return true - the string is a comparsion operator, otherwise - false
+     */
     public boolean isComparsionOperator(String s) {
         return s.matches(">|<|==|!=|>=|<=");
     }
 
+    /**
+     * Retrieves the next token of the expression based on the current index(class
+     * var)
+     * 
+     * @param expression The expression to extract a token from
+     * @return The next token of the expression
+     * @throws Exception Illegal expression. EX: use of reserved words
+     */
     public String nextToken(String expression) throws Exception {
-        if (!insert.isEmpty())
+        if (!insert.isEmpty())// check if any tokens were inserted. EX: Negative number handling
             return insert.poll();
-        int startIndex = index;
-        int bracket = 0;
-        if (Character.isLetterOrDigit(expression.charAt(index))) {
-            while (++index < expression.length() && (Character.isLetterOrDigit(expression.charAt(index))
+        int startIndex = index;// store start of token index
+        int bracket = 0;// track [] to prevent dividing an array element
+        if (Character.isLetterOrDigit(expression.charAt(index))) {// handles constants and variables
+            while (++index < expression.length() && (Character.isLetterOrDigit(expression.charAt(index))// go to end of
+                                                                                                        // constant or
+                                                                                                        // variable
                     || expression.charAt(index) == '[' || bracket > 0)) {
-                if (expression.charAt(index) == '[') {
+                if (expression.charAt(index) == '[') {// handle []
                     bracket++;
-                } else if (expression.charAt(index) == ']') {
+                } else if (expression.charAt(index) == ']') {// handle []
                     if (--bracket == 0) {
                         index++;
                         break;
                     }
                 }
             }
-        } else {
+        } else {// handle operators
             index = expression.length();
-            while (!isOperator(expression.substring(startIndex, index--))) {
+            while (!isOperator(expression.substring(startIndex, index--))) {// search for largest valid operator from
+                                                                            // the end of the expression
             }
             index++;
         }
-        String token = expression.substring(startIndex, index);
-        if (isReserved(token))
+        String token = expression.substring(startIndex, index);// retrieve token
+        if (isReserved(token))// check if variable name is valid
             throw new Exception("Illegal use of '" + token + "'");
         return token;
     }
 
+    /**
+     * 
+     * @param regA
+     * @param regB
+     * @return
+     */
     public String add(int regA, int regB) {
         return "add " + regA + " " + regB + "\n";
     }
@@ -621,7 +702,7 @@ public class MyCompiler {// Kevin
     }
 
     public void insertVariable(String var, int size) throws Exception {
-        if (isReserved(var) || !var.matches(".*[a-zA-Z]+.*"))
+        if (isReserved(var) || !var.matches("[a-zA-Z]+[a-zA-Z0-9]*"))
             throw new Exception("'" + var + "' is not a valid variable");
         variables.put(var, stackPointer -= size);
     }
@@ -659,6 +740,12 @@ public class MyCompiler {// Kevin
         out.append(loadConst(stackPointer++, reg));
         out.append("load ").append(reg).append(" ").append(reg).append("\n");
         return out.toString();
+    }
+
+    public void close() throws Exception {
+        if (!jumpStack.isEmpty()) {
+            throw new Exception("expected 'end'");
+        }
     }
 
     public MyCompiler(int stackPointer) {
