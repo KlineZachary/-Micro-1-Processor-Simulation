@@ -49,7 +49,6 @@ public class Console {
 	 * @param fName the name of a file containing hex numbers
 	 */
 	public void load(String fName) throws Exception {
-
 		File f = new File(fName);
 		Scanner scan = new Scanner(f);
 		int address = 0;
@@ -58,7 +57,26 @@ public class Console {
 		}
 		cpu.setPC(0);
 		scan.close();
+	}
 
+	//Zach 
+	/**
+	 * Grabs each line of the file add appends it to string
+	 * This is used to print that string to gui
+	 * @param fileName
+	 * @return fileText.toString()
+	 * @throws Exception
+	 */
+	public String printFile(String fileName) throws Exception{
+		StringBuilder fileText = new StringBuilder("");
+		File f = new File(fileName);
+		Scanner scan = new Scanner(f);
+		while (scan.hasNextLine()) {
+			fileText.append(scan.nextLine() + "\n");
+		}
+
+		scan.close();
+		return fileText.toString();
 	}
 
 	/**
