@@ -11,10 +11,12 @@ public class Micro1Viewer {
 
     // Vars
     static Console console = new Console(1024);
-    //static JTextArea textArea = new JTextArea(5, 20);
+    // static JTextArea textArea = new JTextArea(5, 20);
     static int textAreas = 4;
+    static int lineNum = 0;
+    static String machineString = "";
 
-    //0 - HL, 1- Assembly, 2- MC, 3- Mem
+    // 0 - HL, 1- Assembly, 2- MC, 3- Mem
     static JTextArea[] textAreaArray = new JTextArea[textAreas];
     static JFrame frame = new JFrame(); // creating instance of JFrame
 
@@ -25,8 +27,7 @@ public class Micro1Viewer {
 
     // Create frame and objects //Edited by zach
     public Micro1Viewer() {
-        
-        
+
         int width = 1400, height = 840;
         JLabel title = new JLabel("Micro1 - Viewer", SwingConstants.CENTER);
         title.setForeground(Color.white);
@@ -35,10 +36,11 @@ public class Micro1Viewer {
         frame.add(title);
 
         // Buttons //Edited by zach
-        String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "BUG","RUN", "?" };
+        String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
         String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step",
-                "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars","Debug each line", "Run entire file","Help" };
-        String[] labels = {"High Level Code", "Assembly Code","Machine Code", "Memory"};
+                "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars",
+                "Debug each line", "Run entire file", "Help" };
+        String[] labels = { "High Level Code", "Assembly Code", "Machine Code", "Memory" };
         Button.loadListener();
         Button.addAll(titles, tooltips, frame);
 
@@ -46,34 +48,30 @@ public class Micro1Viewer {
         Color customColor = Color.decode("#202021");
         frame.getContentPane().setBackground(customColor);
 
+        // Add labels
 
-        //Add labels
-
-
-       
-        //Create multiple text areas and labels fro those text areas
+        // Create multiple text areas and labels fro those text areas
         int x = -240;
         int y = 240;
-        for(int i = 0; i < textAreas;i++){
-            x+= 260;
-            //Add labels and set properties
+        for (int i = 0; i < textAreas; i++) {
+            x += 260;
+            // Add labels and set properties
             JLabel label = new JLabel();
-            label.setBounds(x + 10, y - 40 , 150, 20);
+            label.setBounds(x + 10, y - 40, 150, 20);
             label.setText(labels[i]);
             label.setForeground(Color.white);
             frame.add(label);
 
-
-            //Add and configure textAreas
-            textAreaArray[i] = new JTextArea(5,20);
-            textAreaArray[i].setEditable(false); //disable
+            // Add and configure textAreas
+            textAreaArray[i] = new JTextArea(5, 20);
+            textAreaArray[i].setEditable(false); // disable
             JScrollPane scrollPane = new JScrollPane(textAreaArray[i]);
             scrollPane.setBounds(x, y, width / 6, height - 280);
             frame.add(scrollPane);
-        
+
         }
-       
-        //Dump memory
+
+        // Dump memory
         textAreaArray[3].setText(console.getMemory().dump());
 
         // Load dimensions of registers and add them
@@ -87,17 +85,6 @@ public class Micro1Viewer {
 
     }
 
-    // ??
-    // public static boolean isWindows() {
-    // String os = System.getProperty("os.name").toLowerCase();
-    // // windows
-    // return (os.indexOf("win") >= 0);
-    // }
-
-    // public String getFile(){
-    // Runtime.getRuntime().exec(isWindows() ? "Explorer.exe \"C:\\\"":"open
-    // /users/");
-    // }
 
     // Creating Buttons
     static class Button extends JButton {
@@ -174,6 +161,8 @@ public class Micro1Viewer {
                 System.out.println(regNumbers[i]);
             }
         }
+        
+       
         // ====================
 
     }
@@ -188,49 +177,79 @@ public class Micro1Viewer {
 
                 switch (button.tag) {
                 case 0:// machine code
+                    lineNum = 0;
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
-                    console.load(path);
-                    textAreaArray[2].setText(console.printFile(path));
+                    if (path != null) {
+                        console.load(path);
+
+                        // Print file to MC textArea
+                        machineString = (console.printFile(path));
+
+                        textAreaArray[2].setText(machineString);
+
+                        // Dump new memory data
+                        textAreaArray[3].setText(console.getMemory().dump());
+
+                        // Scroll back to top of mem
+                        textAreaArray[3].setCaretPosition(0);
+
+                    }
+
                     break;
                 case 1:// assembly code
+
+                    lineNum = 0;
+
+                    // This prevents empty error message if user clicks cancel
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
-                    console.assemble(path);
-                    textAreaArray[1].setText(console.printFile(path));
+                    if (path != null) {
+                        console.assemble(path);
+                        textAreaArray[1].setText(console.printFile(path));
+                    }
+
                     break;
                 case 2: // Compiler
+
+                    lineNum = 0;
+
                     path = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the path to the File that you would like to compile:");
-                    console.compile(path);
-                    textAreaArray[0].setText(console.printFile(path));
+
+                    // This prevents empty error message if user clicks cancel
+                    if (path != null) {
+                        console.compile(path);
+                        textAreaArray[0].setText(console.printFile(path));
+                        
+                    }
 
                     break;
                 case 3:// Empty Text
-                    emptyTextAreas();
+                    clear();
                     break;
                 case 4:// Step //
 
                     // Ask how many steps and then step through
                     createInputDialog();
 
-                    // Update Registers after stepping
-                    DisplayRegister.updateRegisters();
-                    
-                    //Dump new memory data
+                   
+
+                    // Dump new memory data
                     textAreaArray[3].setText(console.getMemory().dump());
 
-                    //Scroll back to top
+                    // Scroll back to top
                     textAreaArray[3].setCaretPosition(0);
                     break;
                 case 5:// Memory dumps to textArea
                     textAreaArray[3].setText(console.getMemory().dump());
 
-                    //Scroll back to top
+                    // Scroll back to top
                     textAreaArray[3].setCaretPosition(0);
+
                     break;
                 case 6: // prints out variable as chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the var name you would like to print");
-                    textAreaArray[0].setText(console.print(input ));
+                    textAreaArray[0].setText(console.print(input));
 
                     break;
                 case 7: // prints out array and length that is chosen by user
@@ -240,13 +259,14 @@ public class Micro1Viewer {
                     textAreaArray[0].setText(console.getArr(input, sizeInput));
                     break;
                 case 8: // print all variables
-                    textAreaArray[0].setText(console.printAll());;
-                    break;
+                    textAreaArray[0].setText(console.printAll());
 
-                case 9: //DEBUG
+                    break;
+                case 9: // DEBUG
+                     textAreaArray[2].setText(getLinesAfter(machineString,true));
                     break;
                 case 10: // RUN
-
+                    textAreaArray[2].setText(getLinesAfter(machineString,false));
                     break;
                 case 11:// Help //Edited by Chris
                     JOptionPane.showMessageDialog(null,
@@ -257,12 +277,15 @@ public class Micro1Viewer {
                     ;
                     break;
                 }
-            } catch (Exception error) {
+            } catch (
+
+            Exception error) {
                 JOptionPane.showMessageDialog(null, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             // =============
 
         }
+
     }
 
     // Zach ====================
@@ -278,16 +301,37 @@ public class Micro1Viewer {
             ; // break
     }
 
-    // public static void scanAllLines(JTextArea textArea){
-    //     int lines = textArea.getLineCount();
-    //     String [] linesString = textArea.getText().split("\n");
-    //     textArea.setText("");;
-    //     for(int i = 0; i < lines; i++){
-    //         textArea.append(linesString[i] + "\n");
-    //         textArea.setSelectedTextColor(Color.green);
-    //     }
 
-    // }
+     /**
+      * Get lines of machine code based on is it is debuging or not
+     * If debuging then each time user hits debug button the line will increase by one and that line will be stepped through every time they click the button
+     * else means they are running it and every line will be stepped through
+      * @param lines
+      * @param isDebug
+      * @return
+      * @throws Exception
+      */
+    public static String getLinesAfter(String lines, boolean isDebug) throws Exception {
+        String[] arr = lines.split("\n");
+        StringBuilder out = new StringBuilder();
+        
+        if (!isDebug){
+            lineNum = arr.length;
+            if (!step(lineNum))
+                ; // break
+        }else{
+             //New out without the lines that have been run
+            for (int i = lineNum + 1; i < arr.length; i++) {
+                 out.append(arr[i]).append("\n");
+            }
+            lineNum++;
+            if (!step(1))
+                ; // break
+        }
+        
+        return out.toString();
+    }
+
     /**
      * Step through and tell user when program is terminated
      */
@@ -296,7 +340,12 @@ public class Micro1Viewer {
         boolean halt = false;
         for (int i = 0; i < numSteps && !halt; i++) {
             if (!halt) {
-                halt = console.getCPU().step(); // Something seems to be wrong here?
+                halt = console.getCPU().step();
+
+                 // Update Registers after stepping
+                 DisplayRegister.updateRegisters();
+                
+
             } else {
 
                 return false;
@@ -307,15 +356,19 @@ public class Micro1Viewer {
         // ===========================================
     }
 
-    public static void emptyTextAreas(){
-        for(int i = 0; i<textAreas;i++){
+    /**
+     * Emptys all text areas with an empty string
+     */
+    public static void clear() {
+        // textAreas -1 because dont want to empty memory textArea
+        for (int i = 0; i < textAreas - 1; i++) {
             textAreaArray[i].setText("");
         }
 
     }
 
-    
-        //Cleaned up code so all the methods there were here arent needed feels like spring cleaning :)
+    // Cleaned up code so all the methods there were here arent needed feels like
+    // spring cleaning :)
 
     // ===========================================
 }

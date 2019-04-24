@@ -255,7 +255,7 @@ public class Console {
 	/**
 	 * Prints out all variables
 	 * 
-	 * @return all.toString() this is the final format of printing all vars
+	 * @return  this is the final format of printing all vars
 	 * @throws Exception
 	 */
 	public String printAll() throws Exception {
