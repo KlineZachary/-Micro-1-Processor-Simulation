@@ -46,7 +46,7 @@ public class Micro1Viewer {
         title.setBounds(100 / 2, 25, width - 100, 50);
         frame.add(title);
 
-        // Buttons //Edited by zach
+        // Zach 
         String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
         String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step",
                 "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars",
@@ -55,7 +55,7 @@ public class Micro1Viewer {
         Button.loadListener();
         Button.addAll(titles, tooltips, frame);
 
-        // Frame Color //Edited by zach
+        // Zach
         Color customColor = Color.decode("#202021");
         frame.getContentPane().setBackground(customColor);
 
@@ -97,6 +97,8 @@ public class Micro1Viewer {
        
     }
 
+    //Zach==================================================
+
     // Creating Buttons
     static class Button extends JButton {
         private static final long serialVersionUID = 1L;
@@ -133,10 +135,10 @@ public class Micro1Viewer {
         }
 
     }
-
+//==================================================
     // Register textfields
     static class DisplayRegister {
-
+//Zach==================================================
         static int x, y = Button.y + Button.length + 50, width, height = 30, dy, index;
         static ArrayList<JTextField> textFieldList = new ArrayList<JTextField>();
 
@@ -162,7 +164,7 @@ public class Micro1Viewer {
                 y += dy;
             }
         }
-
+//==================================================
         // Zach ====================
         // Update register values on gui
         public static void updateRegisters() {
@@ -287,9 +289,9 @@ public class Micro1Viewer {
             update();
 
         }
-        // =============
+     
     }
-
+   // =======================================
     // Zach ==================================================
     /**
      * Create Input dialog for num of steps Then call step method with number that
