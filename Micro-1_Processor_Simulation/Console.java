@@ -22,7 +22,7 @@ public class Console {
 	private Assembler assembler;
 
 	private MyCompiler compiler;
-
+//Zach =============
 	/**
 	 * Constructs a memory with specified number of cells, and constructs an
 	 * associated processor.
@@ -41,7 +41,7 @@ public class Console {
 	public Console() {
 		this(256);
 	}
-
+// =============
 	/**
 	 * Loads hexadecimal numbers stored in fName into memory starting at address 0.
 	 * Resets PC to 0.
