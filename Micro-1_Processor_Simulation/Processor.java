@@ -140,7 +140,7 @@ public class Processor {
         return true;
     }
 
-    ///// Think Zach cant remember
+    ///// Think Zach
     public String[] guiDump() {
         String[] regNumbers = new String[reg.length];
         for (int i = 0; i < 8; i++) {

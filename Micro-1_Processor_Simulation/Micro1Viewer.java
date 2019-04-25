@@ -8,14 +8,15 @@ import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 
-//Moslty all zach
+//About 95% of this gui was Zach Kline
 public class Micro1Viewer {
 
     // Vars
     static Console console = new Console(1024);
-    // static JTextArea textArea = new JTextArea(5, 20);
+
     static int textAreas = 4;
     static int lineNum = 0;
+
     static String machineString = "";
     static String assemblyString = "";
     static String compileString = "";
@@ -26,7 +27,7 @@ public class Micro1Viewer {
     static JTextArea compileTextArea = new JTextArea(5, 20);
     static JTextArea memoryTextArea = new JTextArea(5, 20);
 
-    // 0 - HL, 1- Assembly, 2- MC, 3- Mem
+    // 0 - Compile, 1- Assembly, 2- MC, 3- Mem
     static JTextArea[] textAreaArray = { compileTextArea, assemblyTextArea, machineTextArea, memoryTextArea };
     static JFrame frame = new JFrame(); // creating instance of JFrame
 
@@ -84,11 +85,16 @@ public class Micro1Viewer {
         DisplayRegister.loadDimensions(width, height);
         DisplayRegister.addAll(frame, 8);
 
+        
         // Frame Properties
         frame.setSize(width, height);
         frame.setLayout(null);// using no layout managers
         frame.setVisible(true);// making the frame visible
+
         update();
+
+       
+       
     }
 
     // Creating Buttons
@@ -141,7 +147,7 @@ public class Micro1Viewer {
             dy = height + 15;
         }
 
-        // Add Register label and text fields //Edited by zach
+        // Add Register label and text fields //Zach
         public static void addAll(JFrame f, int count) {
             for (int i = 0; i < count; i++) {
                 JLabel label = new JLabel("Register " + i);
@@ -185,18 +191,8 @@ public class Micro1Viewer {
                     lineNum = 0;
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
                     if (path != null) {
-
-                        // Print file to MC textArea
                         machineString = (console.load(path));
-
-                        textAreaArray[2].setText(machineString);
-
-                        // Dump new memory data
-                        textAreaArray[3].setText(console.getMemory().dump());
-
-                        // Scroll back to top of mem
-                        textAreaArray[3].setCaretPosition(0);
-
+                        update();
                     }
 
                     break;
@@ -208,6 +204,7 @@ public class Micro1Viewer {
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
                     if (path != null) {
                         assemblyString = console.assemble(path);
+                        update();
                     }
 
                     break;
@@ -246,24 +243,33 @@ public class Micro1Viewer {
                 case 6: // prints out variable as chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the var name you would like to print");
-                    textAreaArray[0].setText(console.print(input));
-
+                    JOptionPane.showMessageDialog(null, console.print(input), "Selected Var", JOptionPane.DEFAULT_OPTION);
                     break;
                 case 7: // prints out array and length that is chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
                     int sizeInput = (Integer.parseInt(JOptionPane.showInputDialog(button.getParent(),
                             "Enter the number of elements you would like to see")));
-                    textAreaArray[0].setText(console.getArr(input, sizeInput));
+                    JOptionPane.showMessageDialog(null, console.getArr(input, sizeInput), "Selected Array and elements", JOptionPane.DEFAULT_OPTION);
                     break;
                 case 8: // print all variables
-                    textAreaArray[0].setText(console.printAll());
+                    JOptionPane.showMessageDialog(null, console.printAll(), "Variables", JOptionPane.DEFAULT_OPTION);
 
                     break;
                 case 9: // DEBUG
-                    step(1);
+                    if (!machineString.isEmpty()){
+                        step(1);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "No machine code to run", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    
                     break;
                 case 10: // RUN
-                    step(Integer.MAX_VALUE);
+                    if (!machineString.isEmpty()){
+                        step(Integer.MAX_VALUE);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "No machine code to run", "Error", JOptionPane.ERROR_MESSAGE);
+
+                    }
                     break;
                 case 11:// Help //Edited by Chris
                     JOptionPane.showMessageDialog(null,
@@ -274,18 +280,17 @@ public class Micro1Viewer {
                     ;
                     break;
                 }
-
+                
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(null, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-
             update();
 
         }
         // =============
     }
 
-    // Zach ====================
+    // Zach ==================================================
     /**
      * Create Input dialog for num of steps Then call step method with number that
      * was inputed
@@ -322,7 +327,7 @@ public class Micro1Viewer {
     }
 
     /**
-     * Step through and tell user when program is terminated
+     * Step through
      */
 
     public static boolean step(int numSteps) throws Exception {
@@ -343,28 +348,35 @@ public class Micro1Viewer {
         }
         System.out.println("done");
         return true;
-        // ===========================================
     }
 
     /**
-     * Emptys all text areas with an empty string
+     * Emptys all text areas with an empty string except memory
      */
     public static void clear() {
-        // textAreas -1 because dont want to empty memory textArea
         compileString = "";
         assemblyString = "";
         machineString = "";
-
     }
 
     /**
-     * Updates registers and memory
+     * Updates all text areas, and registers
      */
     public static void update() {
-        String[] allStrings = { compileString, assemblyString, machineString, memoryString };
+        String[] allStrings = {compileString, assemblyString, machineString, memoryString};
+
+        //Update registers
         DisplayRegister.updateRegisters();
+
+        //Update mem
+        memoryString = console.getMemory().dump();
+
+        //Fill textAreas with new string values
         for (int i = 0; i < textAreaArray.length; i++) {
+
             textAreaArray[i].setText(allStrings[i]);
+
+            //Bring text area cursor back to top
             textAreaArray[i].setCaretPosition(0);
         }
 
@@ -372,6 +384,5 @@ public class Micro1Viewer {
 
     // Cleaned up code so all the methods there were here arent needed feels like
     // spring cleaning :)
-
-    // ===========================================
+    // ============================================================================
 }

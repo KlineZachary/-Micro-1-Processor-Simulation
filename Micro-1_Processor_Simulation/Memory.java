@@ -25,7 +25,7 @@ public class Memory {
         }
         return b.toString();
     }
-
+    
     public String dumpInstructions() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < cap && cell[i] != 0; i++) {// Kevin
@@ -43,9 +43,10 @@ public class Memory {
     }
 
     public int[] getCells() {
-        return cell;
+        return cell; // Zach
     }
 
+    
     public void isValidAddress(int addr) throws Exception {
         if (addr < 0 || addr >= cap)
             throw new Exception("Invalid memory access at " + addr);
