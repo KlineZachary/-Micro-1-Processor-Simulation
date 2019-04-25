@@ -6,7 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
 
+//Moslty all zach
 public class Micro1Viewer {
 
     // Vars
@@ -15,9 +17,17 @@ public class Micro1Viewer {
     static int textAreas = 4;
     static int lineNum = 0;
     static String machineString = "";
+    static String assemblyString = "";
+    static String compileString = "";
+    static String memoryString = "";
+
+    static JTextArea machineTextArea = new JTextArea(5, 20);
+    static JTextArea assemblyTextArea = new JTextArea(5, 20);
+    static JTextArea compileTextArea = new JTextArea(5, 20);
+    static JTextArea memoryTextArea = new JTextArea(5, 20);
 
     // 0 - HL, 1- Assembly, 2- MC, 3- Mem
-    static JTextArea[] textAreaArray = new JTextArea[textAreas];
+    static JTextArea[] textAreaArray = { compileTextArea, assemblyTextArea, machineTextArea, memoryTextArea };
     static JFrame frame = new JFrame(); // creating instance of JFrame
 
     // Main
@@ -63,16 +73,12 @@ public class Micro1Viewer {
             frame.add(label);
 
             // Add and configure textAreas
-            textAreaArray[i] = new JTextArea(5, 20);
             textAreaArray[i].setEditable(false); // disable
             JScrollPane scrollPane = new JScrollPane(textAreaArray[i]);
             scrollPane.setBounds(x, y, width / 6, height - 280);
             frame.add(scrollPane);
 
         }
-
-        // Dump memory
-        textAreaArray[3].setText(console.getMemory().dump());
 
         // Load dimensions of registers and add them
         DisplayRegister.loadDimensions(width, height);
@@ -82,9 +88,8 @@ public class Micro1Viewer {
         frame.setSize(width, height);
         frame.setLayout(null);// using no layout managers
         frame.setVisible(true);// making the frame visible
-
+        update();
     }
-
 
     // Creating Buttons
     static class Button extends JButton {
@@ -161,18 +166,18 @@ public class Micro1Viewer {
                 System.out.println(regNumbers[i]);
             }
         }
-        
-       
+
         // ====================
 
     }
 
+    // Zach=============
     // Button Actions
     static class Clicklistener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Button button = (Button) (e.getSource());
             String path, input;
-            // Zach=============
+
             try {
 
                 switch (button.tag) {
@@ -180,10 +185,9 @@ public class Micro1Viewer {
                     lineNum = 0;
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
                     if (path != null) {
-                        console.load(path);
 
                         // Print file to MC textArea
-                        machineString = (console.printFile(path));
+                        machineString = (console.load(path));
 
                         textAreaArray[2].setText(machineString);
 
@@ -203,8 +207,7 @@ public class Micro1Viewer {
                     // This prevents empty error message if user clicks cancel
                     path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
                     if (path != null) {
-                        console.assemble(path);
-                        textAreaArray[1].setText(console.printFile(path));
+                        assemblyString = console.assemble(path);
                     }
 
                     break;
@@ -217,9 +220,10 @@ public class Micro1Viewer {
 
                     // This prevents empty error message if user clicks cancel
                     if (path != null) {
-                        console.compile(path);
-                        textAreaArray[0].setText(console.printFile(path));
-                        
+                        compileString = console.compile(path);
+                        assemblyString = console.assemble(console.changeFileExtension(new File(path), ".asm"));
+                        machineString = console.getMemory().dumpInstructions();
+                        update();
                     }
 
                     break;
@@ -231,19 +235,12 @@ public class Micro1Viewer {
                     // Ask how many steps and then step through
                     createInputDialog();
 
-                   
-
                     // Dump new memory data
-                    textAreaArray[3].setText(console.getMemory().dump());
+                    machineString = console.getMemory().dump();
 
-                    // Scroll back to top
-                    textAreaArray[3].setCaretPosition(0);
                     break;
                 case 5:// Memory dumps to textArea
-                    textAreaArray[3].setText(console.getMemory().dump());
-
-                    // Scroll back to top
-                    textAreaArray[3].setCaretPosition(0);
+                    memoryString = console.getMemory().dump();
 
                     break;
                 case 6: // prints out variable as chosen by user
@@ -263,10 +260,10 @@ public class Micro1Viewer {
 
                     break;
                 case 9: // DEBUG
-                     textAreaArray[2].setText(getLinesAfter(machineString,true));
+                    step(1);
                     break;
                 case 10: // RUN
-                    textAreaArray[2].setText(getLinesAfter(machineString,false));
+                    step(Integer.MAX_VALUE);
                     break;
                 case 11:// Help //Edited by Chris
                     JOptionPane.showMessageDialog(null,
@@ -277,15 +274,15 @@ public class Micro1Viewer {
                     ;
                     break;
                 }
-            } catch (
 
-            Exception error) {
+            } catch (Exception error) {
                 JOptionPane.showMessageDialog(null, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-            // =============
+
+            update();
 
         }
-
+        // =============
     }
 
     // Zach ====================
@@ -301,34 +298,26 @@ public class Micro1Viewer {
             ; // break
     }
 
-
-     /**
-      * Get lines of machine code based on is it is debuging or not
-     * If debuging then each time user hits debug button the line will increase by one and that line will be stepped through every time they click the button
-     * else means they are running it and every line will be stepped through
-      * @param lines
-      * @param isDebug
-      * @return
-      * @throws Exception
-      */
-    public static String getLinesAfter(String lines, boolean isDebug) throws Exception {
+    /**
+     * Get lines of machine code based on is it is debuging or not If debuging then
+     * each time user hits debug button the line will increase by one and that line
+     * will be stepped through every time they click the button else means they are
+     * running it and every line will be stepped through
+     * 
+     * @param lines
+     * @param isDebug
+     * @return
+     * @throws Exception
+     */
+    public static String getLinesAfter(String lines) throws Exception {
         String[] arr = lines.split("\n");
         StringBuilder out = new StringBuilder();
-        
-        if (!isDebug){
-            lineNum = arr.length;
-            if (!step(lineNum))
-                ; // break
-        }else{
-             //New out without the lines that have been run
-            for (int i = lineNum + 1; i < arr.length; i++) {
-                 out.append(arr[i]).append("\n");
-            }
-            lineNum++;
-            if (!step(1))
-                ; // break
+
+        // New out without the lines that have been run
+        for (int i = lineNum + 1; i < arr.length; i++) {
+            out.append(arr[i]).append("\n");
         }
-        
+
         return out.toString();
     }
 
@@ -338,13 +327,14 @@ public class Micro1Viewer {
 
     public static boolean step(int numSteps) throws Exception {
         boolean halt = false;
-        for (int i = 0; i < numSteps && !halt; i++) {
+        for (int i = 0; i < numSteps && !halt; i++, lineNum++) {
             if (!halt) {
                 halt = console.getCPU().step();
 
-                 // Update Registers after stepping
-                 DisplayRegister.updateRegisters();
-                
+                // Update Registers and memory after stepping
+                assemblyString = getLinesAfter(assemblyString);
+                machineString = getLinesAfter(machineString);
+                update();
 
             } else {
 
@@ -361,8 +351,21 @@ public class Micro1Viewer {
      */
     public static void clear() {
         // textAreas -1 because dont want to empty memory textArea
-        for (int i = 0; i < textAreas - 1; i++) {
-            textAreaArray[i].setText("");
+        compileString = "";
+        assemblyString = "";
+        machineString = "";
+
+    }
+
+    /**
+     * Updates registers and memory
+     */
+    public static void update() {
+        String[] allStrings = { compileString, assemblyString, machineString, memoryString };
+        DisplayRegister.updateRegisters();
+        for (int i = 0; i < textAreaArray.length; i++) {
+            textAreaArray[i].setText(allStrings[i]);
+            textAreaArray[i].setCaretPosition(0);
         }
 
     }

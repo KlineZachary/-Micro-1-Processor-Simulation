@@ -48,35 +48,19 @@ public class Console {
 	 * 
 	 * @param fName the name of a file containing hex numbers
 	 */
-	public void load(String fName) throws Exception {
+	public String load(String fName) throws Exception {
 		File f = new File(fName);
 		Scanner scan = new Scanner(f);
 		int address = 0;
+		StringBuilder out = new StringBuilder();
 		while (scan.hasNext()) {
-			memory.write(address++, scan.nextInt(16));
+			String line = scan.next();
+			memory.write(address++, Integer.parseInt(line,16));
+			out.append(line).append("\n");
 		}
 		cpu.setPC(0);
 		scan.close();
-	}
-
-	//Zach 
-	/**
-	 * Grabs each line of the file add appends it to string
-	 * This is used to print that string to gui
-	 * @param fileName
-	 * @return fileText.toString()
-	 * @throws Exception
-	 */
-	public String printFile(String fileName) throws Exception{
-		StringBuilder fileText = new StringBuilder("");
-		File f = new File(fileName);
-		Scanner scan = new Scanner(f);
-		while (scan.hasNextLine()) {
-			fileText.append(scan.nextLine() + "\n");
-		}
-
-		scan.close();
-		return fileText.toString();
+		return out.toString();
 	}
 
 	/**
@@ -86,8 +70,9 @@ public class Console {
 	 */
 	// Kevin==============================================
 
-	public void assemble(String fName) throws Exception {
+	public String assemble(String fName) throws Exception {
 		String current = "";
+		StringBuilder out = new StringBuilder();
 		try {
 			File f = new File(fName);
 			Scanner scan = new Scanner(f);
@@ -96,6 +81,7 @@ public class Console {
 			ArrayList<String> tokens = new ArrayList<String>();
 			for (int lineNum = 0; scan.hasNext(); lineNum++) {
 				String token = current = scan.next();
+				out.append(token).append("\n");
 				if (token.startsWith("label")) {
 					assembler.insertLabel(Integer.parseInt(token.substring(5), 16), lineNum--);
 
@@ -140,13 +126,15 @@ public class Console {
 		} catch (Exception e) {
 			throw new Exception("ASM Error: " + e.getMessage() + " with line '" + current + "'");
 		}
+		return out.toString();
 	}
 
-	public void compile(String fName) throws Exception {
+	public String compile(String fName) throws Exception {
 		int lineNumber = 0;
 		String line = "";
 		File f = new File(fName);
-		StringBuilder b = new StringBuilder();
+		StringBuilder linesBuilder = new StringBuilder();
+		StringBuilder assemblyLines = new StringBuilder();
 		try {
 
 			Scanner scan = new Scanner(f);
@@ -158,12 +146,11 @@ public class Console {
 						throw new Exception("missing ';'");
 					if ((line.matches(".*[0-9a-zA-Z\\[\\]] [0-9a-zA-Z\\[\\]].*")))
 						throw new Exception("missing operator");
-					b.append(line);
+					linesBuilder.append(line).append("\n");
 				}
 			}
 			scan.close();
-			String[] lines = b.toString().replace("true", "1").replace("false", "0").split(";");
-			b = new StringBuilder();
+			String[] lines = linesBuilder.toString().replace("true", "1").replace("false", "0").replace("\n","").split(";");
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
 				boolean isArrayDeclaration = false;
@@ -188,12 +175,12 @@ public class Console {
 				if (!isArrayDeclaration) {
 					String evaluated = compiler.evaluate(line, 1, 0);
 					if (evaluated.length() > 0) {
-						b.append(evaluated);
+						assemblyLines.append(evaluated);
 					}
 				}
 				lineNumber++;
 			}
-			b.append("halt");
+			assemblyLines.append("halt");
 			compiler.close();
 			System.out.println("Compiled successfully");
 
@@ -201,12 +188,16 @@ public class Console {
 			// e.printStackTrace();
 			throw new Exception("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
 		}
-		String asmName = f.getAbsolutePath().split("\\.")[0] + ".asm";
 		// String asmName = "assembled.assm";
-		PrintWriter writer = new PrintWriter(asmName);
-		writer.println(b.toString());
+		PrintWriter writer = new PrintWriter(changeFileExtension(f, ".asm"));
+		writer.println(assemblyLines.toString());
 		writer.close();
-		assemble(asmName);
+		return linesBuilder.toString();
+	}
+
+	public String changeFileExtension(File file, String newExt){
+		return file.getAbsolutePath().split("\\.")[0] + "." + newExt;
+
 	}
 
 	/**
@@ -352,7 +343,9 @@ public class Console {
 					assemble(kbd.next());
 					System.out.println("done");
 				} else if (cmmd.equals("cmp")) {
-					compile(kbd.next());
+					String path = kbd.next();
+					compile(path);
+					assemble(changeFileExtension(new File(path), ".asm"));
 					System.out.println("done");
 				} else if (cmmd.equals("memory")) {
 					String dump = memory.dump();
