@@ -1,335 +1,516 @@
 loadc 1
-63
+4
 loadc 0
-3fe
+3f7
 store 0 1
 loadc 1
-3fe
+3f7
 load 1 1
 loadc 0
-3ff
+3f7
 store 0 1
 loadc 1
-5
+0
 loadc 0
-3fd
+3f6
 store 0 1
 loadc 1
-3fd
+3f6
 load 1 1
 loadc 0
-3fe
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
 store 0 1
 loadc 1
-3
+7
 loadc 0
-3fc
+3f7
 store 0 1
 loadc 1
-3fc
+3f7
 load 1 1
 loadc 0
-3fd
-store 0 1
-loadc 1
-3
-loadc 0
-3fb
-store 0 1
-loadc 1
-3ff
-load 1 1
-loadc 0
-3fa
-store 0 1
-loadc 0
-3fa
-load 0 0
-loadc 1
-3fb
-load 1 1
-mul 1 0
-loadc 0
-3fb
-store 0 1
-loadc 1
-2
-loadc 0
-3fa
-store 0 1
-loadc 1
-3fe
-load 1 1
-loadc 0
-3f9
-store 0 1
-loadc 0
-3f9
-load 0 0
-loadc 1
-3fa
-load 1 1
-mul 1 0
-loadc 0
-3fa
-store 0 1
-loadc 0
-3fa
-load 0 0
-loadc 1
-3fb
-load 1 1
-add 1 0
-loadc 0
-3fb
-store 0 1
-loadc 1
-3fd
-load 1 1
-loadc 0
-3fa
-store 0 1
-loadc 0
-3fa
-load 0 0
-loadc 1
-3fb
-load 1 1
-add 1 0
-loadc 0
-3fb
-store 0 1
-loadc 1
-3fb
-load 1 1
-loadc 0
-3fc
-store 0 1
-loadc 1
-5
-loadc 0
-3fa
-store 0 1
-loadc 1
-3fa
-load 1 1
-loadc 0
-3fb
+3f7
 store 0 1
 loadc 1
 1
 loadc 0
-3f9
+3f6
 store 0 1
 loadc 1
-3f9
+3f6
 load 1 1
 loadc 0
-3fa
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+9
+loadc 0
+3f7
+store 0 1
+loadc 1
+3f7
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+2
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+0
+loadc 0
+3f7
+store 0 1
+loadc 1
+3f7
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+3
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+9
+loadc 0
+3f7
+store 0 1
+loadc 1
+3f7
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+4
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+3
+loadc 0
+3f7
+store 0 1
+loadc 1
+3f7
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+5
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+1
+loadc 0
+3f7
+store 0 1
+loadc 1
+3f7
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+6
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+5
+loadc 0
+3f7
+store 0 1
+loadc 1
+3f7
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+7
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f7
+load 1 1
+store 0 1
+loadc 1
+8
+loadc 0
+3f6
+store 0 1
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f7
+store 0 1
+loadc 1
+1
+loadc 0
+3f5
+store 0 1
+loadc 1
+3f5
+load 1 1
+loadc 0
+3f6
 store 0 1
 label1
 loadc 1
-3fb
+3f6
 load 1 1
 loadc 0
-3f9
+3f5
 store 0 1
 loadc 1
-3f9
+3f7
+load 1 1
+loadc 0
+3f4
+store 0 1
+loadc 0
+3f4
+load 0 0
+loadc 1
+3f5
+load 1 1
+sub 0 1
+loadc 1
+0
+add 1 0
+loadc 0
+3f5
+store 0 1
+loadc 1
+3f5
 load 1 1
 loadc 0
 goto2
 if 1 0
 loadc 1
-3fa
+3f6
 load 1 1
 loadc 0
-3f9
+3f4
 store 0 1
 loadc 1
-3fa
+3f4
 load 1 1
 loadc 0
-3f8
+3f5
+store 0 1
+label3
+loadc 1
+3f5
+load 1 1
+loadc 0
+3f4
+store 0 1
+loadc 1
+0
+loadc 0
+3f3
 store 0 1
 loadc 0
-3f8
+3f3
 load 0 0
 loadc 1
-3f9
+3f4
 load 1 1
-lshift 1 0
+sub 1 0
 loadc 0
-3f9
+3f4
 store 0 1
 loadc 1
-3f9
+3f5
 load 1 1
 loadc 0
-3fa
-store 0 1
-loadc 1
-3fb
-load 1 1
-loadc 0
-3f9
+3f3
 store 0 1
 loadc 1
 1
 loadc 0
-3f8
+3f2
 store 0 1
 loadc 0
-3f8
+3f2
 load 0 0
 loadc 1
-3f9
+3f3
 load 1 1
 sub 1 0
 loadc 0
-3f9
+3f3
 store 0 1
 loadc 1
-3f9
-load 1 1
-loadc 0
-3fb
-store 0 1
-loadc 1
-0
-loadc 0
-goto1
-if 1 0
-label2
-loadc 1
-0
-loadc 0
-3f8
-store 0 1
-loadc 1
-3f8
-load 1 1
-loadc 0
-3f9
-store 0 1
-loadc 1
-3ff
-load 1 1
-loadc 0
-3f7
-store 0 1
-loadc 1
-3f7
+3f3
 load 1 1
 loadc 0
 3f8
-store 0 1
-loadc 1
-0
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
+add 1 0
 load 1 1
 loadc 0
-3f7
+3f3
 store 0 1
-label3
 loadc 1
+3f5
+load 1 1
+loadc 0
+3f2
+store 0 1
+loadc 1
+3f2
+load 1 1
+loadc 0
 3f8
+add 1 0
 load 1 1
 loadc 0
-3f6
+3f2
+store 0 1
+loadc 0
+3f2
+load 0 0
+loadc 1
+3f3
+load 1 1
+sub 1 0
+loadc 0
+3f3
+store 0 1
+loadc 0
+3f3
+load 0 0
+loadc 1
+3f4
+load 1 1
+and 1 0
+loadc 0
+3f4
 store 0 1
 loadc 1
-3f6
+3f4
 load 1 1
 loadc 0
 goto4
 if 1 0
 loadc 1
-3f9
+3f5
 load 1 1
 loadc 0
-3f6
+3f3
 store 0 1
 loadc 1
+3f3
+load 1 1
+loadc 0
 3f8
-load 1 1
-loadc 0
-3f5
-store 0 1
-loadc 0
-3f5
-load 0 0
-loadc 1
-3f6
-load 1 1
 add 1 0
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
 load 1 1
 loadc 0
-3f9
+3f3
 store 0 1
 loadc 1
-3f8
+3f3
 load 1 1
 loadc 0
-3f6
+3f4
 store 0 1
 loadc 1
-3f8
-load 1 1
-loadc 0
 3f5
-store 0 1
-loadc 0
-3f5
-load 0 0
-loadc 1
-3f6
-load 1 1
-rshift 1 0
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
 load 1 1
 loadc 0
-3f8
-store 0 1
-loadc 1
-3f7
-load 1 1
-loadc 0
-3f6
+3f3
 store 0 1
 loadc 1
 1
 loadc 0
-3f5
+3f2
 store 0 1
 loadc 0
-3f5
+3f2
 load 0 0
 loadc 1
-3f6
+3f3
 load 1 1
-add 1 0
+sub 1 0
 loadc 0
-3f6
+3f3
 store 0 1
 loadc 1
-3f6
+3f3
 load 1 1
 loadc 0
-3f7
+3f8
+add 1 0
+load 1 1
+loadc 0
+3f3
+store 0 1
+loadc 1
+3f3
+load 1 1
+loadc 0
+3f3
+store 0 1
+loadc 1
+3f5
+load 1 1
+loadc 0
+3f2
+store 0 1
+loadc 1
+3f2
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f3
+load 1 1
+store 0 1
+loadc 1
+3f4
+load 1 1
+loadc 0
+3f3
+store 0 1
+loadc 1
+3f3
+load 1 1
+loadc 0
+3f3
+store 0 1
+loadc 1
+3f5
+load 1 1
+loadc 0
+3f2
+store 0 1
+loadc 1
+1
+loadc 0
+3f1
+store 0 1
+loadc 0
+3f1
+load 0 0
+loadc 1
+3f2
+load 1 1
+sub 1 0
+loadc 0
+3f2
+store 0 1
+loadc 1
+3f2
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+3f3
+load 1 1
+store 0 1
+loadc 1
+3f5
+load 1 1
+loadc 0
+3f3
+store 0 1
+loadc 1
+1
+loadc 0
+3f2
+store 0 1
+loadc 0
+3f2
+load 0 0
+loadc 1
+3f3
+load 1 1
+sub 1 0
+loadc 0
+3f3
+store 0 1
+loadc 1
+3f3
+load 1 1
+loadc 0
+3f5
 store 0 1
 loadc 1
 0
@@ -337,4 +518,37 @@ loadc 0
 goto3
 if 1 0
 label4
+loadc 1
+3f6
+load 1 1
+loadc 0
+3f3
+store 0 1
+loadc 1
+1
+loadc 0
+3f2
+store 0 1
+loadc 0
+3f2
+load 0 0
+loadc 1
+3f3
+load 1 1
+add 1 0
+loadc 0
+3f3
+store 0 1
+loadc 1
+3f3
+load 1 1
+loadc 0
+3f6
+store 0 1
+loadc 1
+0
+loadc 0
+goto1
+if 1 0
+label2
 halt

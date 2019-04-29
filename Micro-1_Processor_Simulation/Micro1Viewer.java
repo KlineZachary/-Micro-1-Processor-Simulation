@@ -16,12 +16,10 @@ public class Micro1Viewer {
     static Console console = new Console(1024);
 
     static int textAreas = 4;
-    static int lineNum = 0;
 
     static String machineString = "";
     static String assemblyString = "";
     static String compileString = "";
-    static String memoryString = "";
 
     static JTextArea machineTextArea = new JTextArea(5, 20);
     static JTextArea assemblyTextArea = new JTextArea(5, 20);
@@ -198,29 +196,18 @@ public class Micro1Viewer {
                 switch (button.tag) {
                 // Chris=============
                 case 0:// machine code
-                    lineNum = 0;
-
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        machineString = (console.load(fc.getSelectedFile().getAbsolutePath()));
-                        update();
+                        machineString = getLinesAfter(console.load(fc.getSelectedFile().getAbsolutePath()));
                     }
                     break;
                 case 1:// assembly code
-
-                    lineNum = 0;
-
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        machineString = (console.assemble(fc.getSelectedFile().getAbsolutePath()));
-                        update();
+                        assemblyString = getLinesAfter(console.assemble(fc.getSelectedFile().getAbsolutePath()));
                     }
                     break;
                 case 2: // Compiler
-
-                    lineNum = 0;
-
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        machineString = (console.compile(fc.getSelectedFile().getAbsolutePath()));
-                        update();
+                        compileString = getLinesAfter(console.compile(fc.getSelectedFile().getAbsolutePath()));
                     }
 
                     break;
@@ -229,17 +216,9 @@ public class Micro1Viewer {
                     clear();
                     break;
                 case 4:// Step //
-
-                    // Ask how many steps and then step through
-                    createInputDialog();
-
-                    // Dump new memory data
-                    machineString = console.getMemory().dump();
-
+                       // REMOVE THIS SWITCH CASE
                     break;
                 case 5:// Memory dumps to textArea
-                    memoryString = console.getMemory().dump();
-
                     break;
                 case 6: // prints out variable as chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(),
@@ -325,7 +304,9 @@ public class Micro1Viewer {
         StringBuilder out = new StringBuilder();
 
         // New out without the lines that have been run
-        for (int i = lineNum + 1; i < arr.length; i++) {
+        int PC = console.getCPU().getPC();
+        System.out.println("PC: " + PC);
+        for (int i = PC; i < arr.length; i++) {
             out.append(arr[i]).append("\n");
         }
 
@@ -338,7 +319,7 @@ public class Micro1Viewer {
 
     public static boolean step(int numSteps) throws Exception {
         boolean halt = false;
-        for (int i = 0; i < numSteps && !halt; i++, lineNum++) {
+        for (int i = 0; i < numSteps && !halt; i++) {
             if (!halt) {
                 halt = console.getCPU().step();
 
@@ -369,13 +350,11 @@ public class Micro1Viewer {
      * Updates all text areas, and registers
      */
     public static void update() {
+        String memoryString = console.getMemory().dump();
         String[] allStrings = { compileString, assemblyString, machineString, memoryString };
 
         // Update registers
         DisplayRegister.updateRegisters();
-
-        // Update mem
-        memoryString = console.getMemory().dump();
 
         // Fill textAreas with new string values
         for (int i = 0; i < textAreaArray.length; i++) {

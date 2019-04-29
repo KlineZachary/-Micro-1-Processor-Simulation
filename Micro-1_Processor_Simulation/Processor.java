@@ -27,10 +27,9 @@ public class Processor {
 
     public boolean execute() throws Exception {
         // Kevin==============================================
-        int decoder = 15;// get token P, A, B
-        int b = IR & decoder;// read first 4
-        int a = (IR & (decoder <<= 4)) >> 4;// read next 4
-        int p = (IR & (decoder <<= 4)) >> 8;// read next 4
+        int b = IR & 15;// read first 4
+        int a = (IR >>= 4) & 15;// read next 4
+        int p = (IR >>= 4) & 15;// read next 4
         // System.out.println("ML: " + p + " " + a + " " + b);
         boolean debug = false;
         switch (p) {// command list + execution code
