@@ -25,28 +25,36 @@ public class Memory {
         }
         return b.toString();
     }
-    
+
+    // Zach==============================================
     public String dumpInstructions() {
         StringBuilder b = new StringBuilder();
-        for (int i = 0; i < cap && cell[i] != 0; i++) {// Kevin
+        for (int i = 0; i < cap && cell[i] != 0; i++) {
             b.append(Integer.toHexString(cell[i])).append("\n");
         }
         return b.toString();
     }
 
+    public void clear() {
+        for (int i = 0; i < cap; i++) {
+            cell[i] = 0;
+        }
+    }
+
     public void setCap(int cap) {
-        this.cap = cap; // Zach
+        this.cap = cap;
     }
 
     public int getCap() {
-        return cap; // Zach
+        return cap;
     }
 
     public int[] getCells() {
-        return cell; // Zach
+        return cell;
     }
+    // Zach==============================================
 
-    
+    // Kevin==============================================
     public void isValidAddress(int addr) throws Exception {
         if (addr < 0 || addr >= cap)
             throw new Exception("Invalid memory access at " + addr);

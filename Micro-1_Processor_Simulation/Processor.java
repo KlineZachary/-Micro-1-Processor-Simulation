@@ -139,6 +139,12 @@ public class Processor {
         return true;
     }
 
+    public void clear() {// Kevin
+        for (int i = 0; i < reg.length; i++) {
+            reg[i] = 0;
+        }
+    }
+
     ///// Think Zach
     public String[] guiDump() {
         String[] regNumbers = new String[reg.length];

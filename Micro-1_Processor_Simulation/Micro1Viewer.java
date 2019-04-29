@@ -89,7 +89,11 @@ public class Micro1Viewer {
         frame.setLayout(null);// using no layout managers
         frame.setVisible(true);// making the frame visible
 
-        update();
+        try {
+            update();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 
@@ -264,11 +268,10 @@ public class Micro1Viewer {
                     ;
                     break;
                 }
-
+                update();
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(null, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-            update();
 
         }
 
@@ -307,6 +310,7 @@ public class Micro1Viewer {
         int PC = console.getCPU().getPC();
         System.out.println("PC: " + PC);
         for (int i = PC; i < arr.length; i++) {
+            System.out.println("MEM:" + arr[i]);
             out.append(arr[i]).append("\n");
         }
 
@@ -322,10 +326,6 @@ public class Micro1Viewer {
         for (int i = 0; i < numSteps && !halt; i++) {
             if (!halt) {
                 halt = console.getCPU().step();
-
-                // Update Registers and memory after stepping
-                assemblyString = getLinesAfter(assemblyString);
-                machineString = getLinesAfter(machineString);
                 update();
 
             } else {
@@ -344,23 +344,25 @@ public class Micro1Viewer {
         compileString = "";
         assemblyString = "";
         machineString = "";
+        console.getCPU().clear();
+        console.getMemory().clear();
     }
 
     /**
      * Updates all text areas, and registers
      */
-    public static void update() {
-        String memoryString = console.getMemory().dump();
-        String[] allStrings = { compileString, assemblyString, machineString, memoryString };
+    public static void update() throws Exception {
+        String memory = console.getMemory().dump();
+        String assembly = getLinesAfter(assemblyString);
+        String machine = getLinesAfter(machineString);
+        String[] allStrings = { compileString, assembly, machine, memory };
 
         // Update registers
         DisplayRegister.updateRegisters();
 
         // Fill textAreas with new string values
         for (int i = 0; i < textAreaArray.length; i++) {
-
             textAreaArray[i].setText(allStrings[i]);
-
             // Bring text area cursor back to top
             textAreaArray[i].setCaretPosition(0);
         }

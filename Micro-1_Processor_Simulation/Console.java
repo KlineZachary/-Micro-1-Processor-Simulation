@@ -227,7 +227,7 @@ public class Console {
 	 * 
 	 * @param var
 	 * @param len
-	 * @return out.append("]").toString() this is the final format of the array
+	 * @return
 	 * @throws Exception
 	 */
 	public String getArr(String var, int len) throws Exception {
