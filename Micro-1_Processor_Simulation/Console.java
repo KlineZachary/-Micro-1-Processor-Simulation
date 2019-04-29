@@ -22,7 +22,8 @@ public class Console {
 	private Assembler assembler;
 
 	private MyCompiler compiler;
-//Zach =============
+
+	// Zach =============
 	/**
 	 * Constructs a memory with specified number of cells, and constructs an
 	 * associated processor.
@@ -41,7 +42,8 @@ public class Console {
 	public Console() {
 		this(256);
 	}
-// =============
+
+	// =============
 	/**
 	 * Loads hexadecimal numbers stored in fName into memory starting at address 0.
 	 * Resets PC to 0.
@@ -55,7 +57,7 @@ public class Console {
 		StringBuilder out = new StringBuilder();
 		while (scan.hasNext()) {
 			String line = scan.next();
-			memory.write(address++, Integer.parseInt(line,16));
+			memory.write(address++, Integer.parseInt(line, 16));
 			out.append(line).append("\n");
 		}
 		cpu.setPC(0);
@@ -150,7 +152,8 @@ public class Console {
 				}
 			}
 			scan.close();
-			String[] lines = linesBuilder.toString().replace("true", "1").replace("false", "0").replace("\n","").split(";");
+			String[] lines = linesBuilder.toString().replace("true", "1").replace("false", "0").replace("\n", "")
+					.split(";");
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
 				boolean isArrayDeclaration = false;
@@ -195,7 +198,7 @@ public class Console {
 		return linesBuilder.toString();
 	}
 
-	public String changeFileExtension(File file, String newExt){
+	public String changeFileExtension(File file, String newExt) {
 		return file.getAbsolutePath().split("\\.")[0] + "." + newExt;
 
 	}
@@ -246,7 +249,7 @@ public class Console {
 	/**
 	 * Prints out all variables
 	 * 
-	 * @return  this is the final format of printing all vars
+	 * @return this is the final format of printing all vars
 	 * @throws Exception
 	 */
 	public String printAll() throws Exception {

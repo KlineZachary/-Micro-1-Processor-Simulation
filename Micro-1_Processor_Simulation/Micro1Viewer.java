@@ -9,6 +9,7 @@ import java.util.*;
 import java.io.*;
 
 //About 95% of this gui was Zach Kline
+//Touch ups and File Chooser was Chris Aranda
 public class Micro1Viewer {
 
     // Vars
@@ -46,7 +47,7 @@ public class Micro1Viewer {
         title.setBounds(100 / 2, 25, width - 100, 50);
         frame.add(title);
 
-        // Zach 
+        // Zach
         String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
         String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step",
                 "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars",
@@ -85,7 +86,6 @@ public class Micro1Viewer {
         DisplayRegister.loadDimensions(width, height);
         DisplayRegister.addAll(frame, 8);
 
-        
         // Frame Properties
         frame.setSize(width, height);
         frame.setLayout(null);// using no layout managers
@@ -93,11 +93,9 @@ public class Micro1Viewer {
 
         update();
 
-       
-       
     }
 
-    //Zach==================================================
+    // Zach==================================================
 
     // Creating Buttons
     static class Button extends JButton {
@@ -135,10 +133,11 @@ public class Micro1Viewer {
         }
 
     }
-//==================================================
+
+    // ==================================================
     // Register textfields
     static class DisplayRegister {
-//Zach==================================================
+        // Zach==================================================
         static int x, y = Button.y + Button.length + 50, width, height = 30, dy, index;
         static ArrayList<JTextField> textFieldList = new ArrayList<JTextField>();
 
@@ -164,7 +163,8 @@ public class Micro1Viewer {
                 y += dy;
             }
         }
-//==================================================
+
+        // ==================================================
         // Zach ====================
         // Update register values on gui
         public static void updateRegisters() {
@@ -184,48 +184,47 @@ public class Micro1Viewer {
     static class Clicklistener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Button button = (Button) (e.getSource());
+            JButton open = new JButton(); // Creat button
+            JFileChooser fc = new JFileChooser(); // Create File chooser
             String path, input;
+
+            // Sets current directory to project location
+            fc.setCurrentDirectory(new java.io.File("."));
+
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
             try {
 
                 switch (button.tag) {
+                // Chris=============
                 case 0:// machine code
                     lineNum = 0;
-                    path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Machine Code File:");
-                    if (path != null) {
-                        machineString = (console.load(path));
+
+                    if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        machineString = (console.load(fc.getSelectedFile().getAbsolutePath()));
                         update();
                     }
-
                     break;
                 case 1:// assembly code
 
                     lineNum = 0;
 
-                    // This prevents empty error message if user clicks cancel
-                    path = JOptionPane.showInputDialog(button.getParent(), "Enter the path to the Assembly Code File:");
-                    if (path != null) {
-                        assemblyString = console.assemble(path);
+                    if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        machineString = (console.assemble(fc.getSelectedFile().getAbsolutePath()));
                         update();
                     }
-
                     break;
                 case 2: // Compiler
 
                     lineNum = 0;
 
-                    path = JOptionPane.showInputDialog(button.getParent(),
-                            "Enter the path to the File that you would like to compile:");
-
-                    // This prevents empty error message if user clicks cancel
-                    if (path != null) {
-                        compileString = console.compile(path);
-                        assemblyString = console.assemble(console.changeFileExtension(new File(path), ".asm"));
-                        machineString = console.getMemory().dumpInstructions();
+                    if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        machineString = (console.compile(fc.getSelectedFile().getAbsolutePath()));
                         update();
                     }
 
                     break;
+                // Chris===========
                 case 3:// Empty Text
                     clear();
                     break;
@@ -245,31 +244,35 @@ public class Micro1Viewer {
                 case 6: // prints out variable as chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the var name you would like to print");
-                    JOptionPane.showMessageDialog(null, console.print(input), "Selected Var", JOptionPane.DEFAULT_OPTION);
+                    JOptionPane.showMessageDialog(null, console.print(input), "Selected Var",
+                            JOptionPane.DEFAULT_OPTION);
                     break;
                 case 7: // prints out array and length that is chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
                     int sizeInput = (Integer.parseInt(JOptionPane.showInputDialog(button.getParent(),
                             "Enter the number of elements you would like to see")));
-                    JOptionPane.showMessageDialog(null, console.getArr(input, sizeInput), "Selected Array and elements", JOptionPane.DEFAULT_OPTION);
+                    JOptionPane.showMessageDialog(null, console.getArr(input, sizeInput), "Selected Array and elements",
+                            JOptionPane.DEFAULT_OPTION);
                     break;
                 case 8: // print all variables
                     JOptionPane.showMessageDialog(null, console.printAll(), "Variables", JOptionPane.DEFAULT_OPTION);
 
                     break;
                 case 9: // DEBUG
-                    if (!machineString.isEmpty()){
+                    if (!machineString.isEmpty()) {
                         step(1);
-                    }else{
-                        JOptionPane.showMessageDialog(null, "No machine code to run", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No machine code to run", "Error",
+                                JOptionPane.ERROR_MESSAGE);
                     }
-                    
+
                     break;
                 case 10: // RUN
-                    if (!machineString.isEmpty()){
+                    if (!machineString.isEmpty()) {
                         step(Integer.MAX_VALUE);
-                    }else{
-                        JOptionPane.showMessageDialog(null, "No machine code to run", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No machine code to run", "Error",
+                                JOptionPane.ERROR_MESSAGE);
 
                     }
                     break;
@@ -282,16 +285,17 @@ public class Micro1Viewer {
                     ;
                     break;
                 }
-                
+
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(null, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             update();
 
         }
-     
+
     }
-   // =======================================
+
+    // =======================================
     // Zach ==================================================
     /**
      * Create Input dialog for num of steps Then call step method with number that
@@ -365,20 +369,20 @@ public class Micro1Viewer {
      * Updates all text areas, and registers
      */
     public static void update() {
-        String[] allStrings = {compileString, assemblyString, machineString, memoryString};
+        String[] allStrings = { compileString, assemblyString, machineString, memoryString };
 
-        //Update registers
+        // Update registers
         DisplayRegister.updateRegisters();
 
-        //Update mem
+        // Update mem
         memoryString = console.getMemory().dump();
 
-        //Fill textAreas with new string values
+        // Fill textAreas with new string values
         for (int i = 0; i < textAreaArray.length; i++) {
 
             textAreaArray[i].setText(allStrings[i]);
 
-            //Bring text area cursor back to top
+            // Bring text area cursor back to top
             textAreaArray[i].setCaretPosition(0);
         }
 

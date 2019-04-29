@@ -52,7 +52,7 @@ public class Processor {
                 System.out.println("MEM[" + reg[a] + "] = REG[" + b + "] =" + reg[b]);
             break;
         // ==============================================
-        // Christopher =====================================
+        // Chris =====================================
         case 4:// add
             if (debug)
                 System.out.println("REG[" + a + "] = " + reg[a] + "+" + reg[b]);
