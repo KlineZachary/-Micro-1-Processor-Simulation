@@ -199,7 +199,7 @@ public class Console {
 	}
 
 	public String changeFileExtension(File file, String newExt) {
-		return file.getAbsolutePath().split("\\.")[0] + "." + newExt;
+		return file.getAbsolutePath().split("\\.")[0] + newExt;
 
 	}
 

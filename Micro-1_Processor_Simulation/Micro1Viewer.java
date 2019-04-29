@@ -207,6 +207,7 @@ public class Micro1Viewer {
                 case 1:// assembly code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         assemblyString = getLinesAfter(console.assemble(fc.getSelectedFile().getAbsolutePath()));
+                        machineString = getLinesAfter(console.getMemory().dumpInstructions());
                     }
                     break;
                 case 2: // Compiler
@@ -308,9 +309,7 @@ public class Micro1Viewer {
 
         // New out without the lines that have been run
         int PC = console.getCPU().getPC();
-        System.out.println("PC: " + PC);
         for (int i = PC; i < arr.length; i++) {
-            System.out.println("MEM:" + arr[i]);
             out.append(arr[i]).append("\n");
         }
 
