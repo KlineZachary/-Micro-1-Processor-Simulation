@@ -29,7 +29,7 @@ public class Memory {
     // Zach==============================================
     public String dumpInstructions() {
         StringBuilder b = new StringBuilder();
-        for (int i = 0; i < cap && cell[i] != 0; i++) {
+        for (int i = 0; i < cap; i++) {
             b.append(Integer.toHexString(cell[i])).append("\n");
         }
         return b.toString();

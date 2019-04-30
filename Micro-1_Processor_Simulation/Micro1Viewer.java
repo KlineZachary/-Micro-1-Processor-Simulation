@@ -173,7 +173,6 @@ public class Micro1Viewer {
             String[] regNumbers = console.getCPU().guiDump();
             for (int i = 0; i < textFieldList.size(); i++) {
                 textFieldList.get(i).setText(regNumbers[i]);
-                System.out.println(regNumbers[i]);
             }
         }
 
@@ -288,8 +287,7 @@ public class Micro1Viewer {
     public static void createInputDialog() throws Exception {
         String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
         int numSteps = Integer.parseInt(userInput);
-        if (!step(numSteps))
-            ; // break
+        step(numSteps);
     }
 
     /**
@@ -310,6 +308,9 @@ public class Micro1Viewer {
         // New out without the lines that have been run
         int PC = console.getCPU().getPC();
         for (int i = PC; i < arr.length; i++) {
+            if ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+")) {
+                break;
+            }
             out.append(arr[i]).append("\n");
         }
 
@@ -320,20 +321,14 @@ public class Micro1Viewer {
      * Step through
      */
 
-    public static boolean step(int numSteps) throws Exception {
-        boolean halt = false;
-        for (int i = 0; i < numSteps && !halt; i++) {
-            if (!halt) {
-                halt = console.getCPU().step();
-                update();
-
-            } else {
-
-                return false;
+    public static void step(int numSteps) throws Exception {
+        for (int i = 0; i < numSteps; i++) {
+            if (!console.step(1)) {
+                return;
             }
+            update();
         }
-        System.out.println("done");
-        return true;
+        return;
     }
 
     /**

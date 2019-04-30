@@ -23,6 +23,8 @@ public class Console {
 
 	private MyCompiler compiler;
 
+	private boolean hasHalt = false;
+
 	// Zach =============
 	/**
 	 * Constructs a memory with specified number of cells, and constructs an
@@ -81,24 +83,32 @@ public class Console {
 			assembler = new Assembler();
 			int address = 0;
 			ArrayList<String> tokens = new ArrayList<String>();
+			boolean reachHalt = false;
 			for (int lineNum = 0; scan.hasNext(); lineNum++) {
 				String token = current = scan.next();
+				if (token.matches("[0-9a-f]+") && !token.equals("add") && !token.matches("[0-9][0-9a-f]*")) {
+					throw new Exception("Hexidecimal constant starting digit is not 0-9");
+				}
 				out.append(token).append("\n");
-				if (token.startsWith("label")) {
+				if (reachHalt) {
+					if (token.matches("[0-9a-f]+")) {
+						tokens.add(token);
+					} else {
+						throw new Exception("Invalid hexadecimal constant after halt");
+					}
+				} else if (token.startsWith("label")) {
 					assembler.insertLabel(Integer.parseInt(token.substring(5), 16), lineNum--);
 
 				} else {
 					tokens.add(token);
-
-					if (token.startsWith("goto")) {
+					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add")))
+						continue;
+					if (token.equals("halt")) {
+						reachHalt = true;
 						continue;
 					}
-					if (token.matches("[0-9a-f]+") && !token.equals("add")) {
-						continue;
-					}
-					if (!token.equals("halt"))
-						tokens.add(scan.next());
-					if (!token.matches("halt|loadc"))
+					tokens.add(scan.next());
+					if (!token.equals("loadc"))
 						tokens.add(scan.next());
 				}
 
@@ -124,7 +134,6 @@ public class Console {
 			}
 			cpu.setPC(0);
 			scan.close();
-			System.out.println("Assembled successfully");
 		} catch (Exception e) {
 			throw new Exception("ASM Error: " + e.getMessage() + " with line '" + current + "'");
 		}
@@ -164,6 +173,9 @@ public class Console {
 						var = compiler.divideIndexedVariable(var)[0];
 					int size = 1;
 					if (line.matches(".*\\[\\].*")) {
+						if (line.matches("[0-9a-zA-Z]+\\[\\]=.*[a-zA-Z].*")) {
+							throw new Exception("Array declaration must include a constant length");
+						}
 						if (!line.matches("[0-9a-zA-Z]+\\[\\]=[0-9]+")) {
 							throw new Exception("Invalid array declaration.");
 						}
@@ -185,7 +197,6 @@ public class Console {
 			}
 			assemblyLines.append("halt");
 			compiler.close();
-			System.out.println("Compiled successfully");
 
 		} catch (Exception e) {
 			// e.printStackTrace();
@@ -269,10 +280,10 @@ public class Console {
 	// ==============================================
 
 	/**
-	 * Displays synopsis of all commands in the console window
+	 * Displays synopsis of all commands in the console windowrq
 	 */
 	public void help() {
-		System.out.println("load fileName \t loads hex memory image into memory");
+		System.out.println("load fileName \t loads machine code as hex into memory");
 		System.out.println("asm fileName \t loads assembly code into memory");
 		System.out.println("cmp fileName \t compiles high level code to assembly and then to memory");
 		System.out.println("memory \t\t dumps memory to console");
@@ -285,26 +296,14 @@ public class Console {
 		System.out.println("quit \t\t terminate console");
 	}
 
-	public boolean step() throws Exception {
-		int num;
-		if (!kbd.hasNextInt()) {
-			num = 0;
-			kbd.next();
-			throw new Exception("invalid number of steps");
-		} else {
-			num = kbd.nextInt();
-			boolean halt = false;
-			for (int i = 0; i < num && !halt; i++) {
-				if (!halt) {
-					halt = cpu.step();
-				}
-
-				if (halt) {
-					System.out.println("program terminated at step " + (i + 1));
-					return false;
-				}
+	public boolean step(int num) throws Exception {
+		if (hasHalt)
+			return false;
+		for (int i = 0; i < num; i++) {
+			if (!cpu.step()) {
+				hasHalt = true;
+				return false;
 			}
-			System.out.println("done");
 		}
 		return true;
 	}
@@ -340,15 +339,24 @@ public class Console {
 				} else if (cmmd.equals("help")) {
 					help();
 				} else if (cmmd.equals("load")) {
+					assembler = null;
+					compiler = null;
+					hasHalt = false;
 					load(kbd.next());
 					System.out.println("done");
 				} else if (cmmd.equals("asm")) {
+					compiler = null;
+					hasHalt = false;
 					assemble(kbd.next());
+					System.out.println("Assembled successfully");
 					System.out.println("done");
 				} else if (cmmd.equals("cmp")) {
 					String path = kbd.next();
+					hasHalt = false;
 					compile(path);
+					System.out.println("Compiled successfully");
 					assemble(changeFileExtension(new File(path), ".asm"));
+					System.out.println("Assembled successfully");
 					System.out.println("done");
 				} else if (cmmd.equals("memory")) {
 					String dump = memory.dump();
@@ -356,8 +364,14 @@ public class Console {
 				} else if (cmmd.equals("registers")) {
 					cpu.dump();
 				} else if (cmmd.equals("step")) {
-					if (!step()) {
-						// break;
+					if (!kbd.hasNextInt()) {
+						kbd.next();
+						throw new Exception("invalid number of steps");
+					}
+					if (!step(kbd.nextInt())) {
+						System.out.println("program terminated");
+					} else {
+						System.out.println("done");
 					}
 				} else if (cmmd.equals("out")) {
 					System.out.println(print(kbd.next()));
