@@ -8,10 +8,10 @@ public class Processor {
     public boolean step() throws Exception {// true = halt program
         // Kevin==============================================
         IR = memory.read(PC++);
-        if (IR == 0 || !execute()) {
-            return true;
-        }
-        return false;
+        if (IR == 0)
+            return false;
+        execute();
+        return true;
         // ==============================================
     }
 
@@ -25,7 +25,7 @@ public class Processor {
         // ==============================================
     }
 
-    public boolean execute() throws Exception {
+    public void execute() throws Exception {
         // Kevin==============================================
         int b = IR & 15;// read first 4
         int a = (IR >>= 4) & 15;// read next 4
@@ -74,8 +74,7 @@ public class Processor {
             break;
         case 7:// div
             if (reg[b] == 0) {
-                System.out.println("Division Error: address " + b + " is zero.");
-                return false;
+                throw new Exception("Division Error: address " + b + " is zero.");
             }
             if (debug)
                 System.out.println("REG[" + a + "] = " + reg[a] + "/" + reg[b]);
@@ -136,7 +135,6 @@ public class Processor {
             break;
         // ==============================================================
         }
-        return true;
     }
 
     public void clear() {// Kevin

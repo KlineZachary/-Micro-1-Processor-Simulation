@@ -1,229 +1,229 @@
 loadc 1
-4
+04
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-0
+00
 loadc 0
-3f6
+03f6
 store 0 1
 loadc 1
-3f6
-load 1 1
-loadc 0
-3f8
-add 0 1
-loadc 1
-3f7
-load 1 1
-store 0 1
-loadc 1
-7
-loadc 0
-3f7
-store 0 1
-loadc 1
-3f7
-load 1 1
-loadc 0
-3f7
-store 0 1
-loadc 1
-1
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
+03f6
 load 1 1
 loadc 0
 3f8
 add 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 store 0 1
 loadc 1
-9
+07
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-2
+01
 loadc 0
-3f6
+03f6
 store 0 1
 loadc 1
-3f6
-load 1 1
-loadc 0
-3f8
-add 0 1
-loadc 1
-3f7
-load 1 1
-store 0 1
-loadc 1
-0
-loadc 0
-3f7
-store 0 1
-loadc 1
-3f7
-load 1 1
-loadc 0
-3f7
-store 0 1
-loadc 1
-3
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
+03f6
 load 1 1
 loadc 0
 3f8
 add 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 store 0 1
 loadc 1
-9
+09
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-4
+02
 loadc 0
-3f6
+03f6
 store 0 1
 loadc 1
-3f6
-load 1 1
-loadc 0
-3f8
-add 0 1
-loadc 1
-3f7
-load 1 1
-store 0 1
-loadc 1
-3
-loadc 0
-3f7
-store 0 1
-loadc 1
-3f7
-load 1 1
-loadc 0
-3f7
-store 0 1
-loadc 1
-5
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
+03f6
 load 1 1
 loadc 0
 3f8
 add 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 store 0 1
 loadc 1
-1
+00
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 loadc 0
-3f7
+03f7
 store 0 1
 loadc 1
-6
+03
 loadc 0
-3f6
+03f6
 store 0 1
 loadc 1
-3f6
-load 1 1
-loadc 0
-3f8
-add 0 1
-loadc 1
-3f7
-load 1 1
-store 0 1
-loadc 1
-5
-loadc 0
-3f7
-store 0 1
-loadc 1
-3f7
-load 1 1
-loadc 0
-3f7
-store 0 1
-loadc 1
-7
-loadc 0
-3f6
-store 0 1
-loadc 1
-3f6
+03f6
 load 1 1
 loadc 0
 3f8
 add 0 1
 loadc 1
-3f7
+03f7
 load 1 1
 store 0 1
 loadc 1
-8
+09
 loadc 0
-3f6
+03f7
 store 0 1
 loadc 1
-3f6
+03f7
+load 1 1
+loadc 0
+03f7
+store 0 1
+loadc 1
+04
+loadc 0
+03f6
+store 0 1
+loadc 1
+03f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+03f7
+load 1 1
+store 0 1
+loadc 1
+03
+loadc 0
+03f7
+store 0 1
+loadc 1
+03f7
+load 1 1
+loadc 0
+03f7
+store 0 1
+loadc 1
+05
+loadc 0
+03f6
+store 0 1
+loadc 1
+03f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+03f7
+load 1 1
+store 0 1
+loadc 1
+01
+loadc 0
+03f7
+store 0 1
+loadc 1
+03f7
+load 1 1
+loadc 0
+03f7
+store 0 1
+loadc 1
+06
+loadc 0
+03f6
+store 0 1
+loadc 1
+03f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+03f7
+load 1 1
+store 0 1
+loadc 1
+05
+loadc 0
+03f7
+store 0 1
+loadc 1
+03f7
+load 1 1
+loadc 0
+03f7
+store 0 1
+loadc 1
+07
+loadc 0
+03f6
+store 0 1
+loadc 1
+03f6
+load 1 1
+loadc 0
+3f8
+add 0 1
+loadc 1
+03f7
+load 1 1
+store 0 1
+loadc 1
+08
+loadc 0
+03f6
+store 0 1
+loadc 1
+03f6
 load 1 1
 loadc 0
 3f7
 store 0 1
 loadc 1
-1
+01
 loadc 0
-3f5
+03f5
 store 0 1
 loadc 1
-3f5
+03f5
 load 1 1
 loadc 0
 3f6
@@ -233,29 +233,29 @@ loadc 1
 3f6
 load 1 1
 loadc 0
-3f5
+03f5
 store 0 1
 loadc 1
 3f7
 load 1 1
 loadc 0
-3f4
+03f4
 store 0 1
 loadc 0
-3f4
+03f4
 load 0 0
 loadc 1
-3f5
+03f5
 load 1 1
 sub 0 1
 loadc 1
-0
+00
 add 1 0
 loadc 0
-3f5
+03f5
 store 0 1
 loadc 1
-3f5
+03f5
 load 1 1
 loadc 0
 goto2
@@ -264,10 +264,10 @@ loadc 1
 3f6
 load 1 1
 loadc 0
-3f4
+03f4
 store 0 1
 loadc 1
-3f4
+03f4
 load 1 1
 loadc 0
 3f5
@@ -277,92 +277,92 @@ loadc 1
 3f5
 load 1 1
 loadc 0
-3f4
+03f4
 store 0 1
 loadc 1
-0
+00
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 0
-3f3
+03f3
 load 0 0
 loadc 1
-3f4
+03f4
 load 1 1
 sub 1 0
 loadc 0
-3f4
+03f4
 store 0 1
 loadc 1
 3f5
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-1
+01
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 0
-3f2
+03f2
 load 0 0
 loadc 1
-3f3
+03f3
 load 1 1
 sub 1 0
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
 3f8
 add 1 0
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
 3f5
 load 1 1
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 1
-3f2
+03f2
 load 1 1
 loadc 0
 3f8
 add 1 0
 load 1 1
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 0
-3f2
+03f2
 load 0 0
 loadc 1
-3f3
+03f3
 load 1 1
 sub 1 0
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 0
-3f3
+03f3
 load 0 0
 loadc 1
-3f4
+03f4
 load 1 1
 and 1 0
 loadc 0
-3f4
+03f4
 store 0 1
 loadc 1
-3f4
+03f4
 load 1 1
 loadc 0
 goto4
@@ -371,20 +371,20 @@ loadc 1
 3f5
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
 3f8
 add 1 0
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
 3f4
@@ -393,127 +393,127 @@ loadc 1
 3f5
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-1
+01
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 0
-3f2
+03f2
 load 0 0
 loadc 1
-3f3
+03f3
 load 1 1
 sub 1 0
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
 3f8
 add 1 0
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
 3f5
 load 1 1
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 1
-3f2
+03f2
 load 1 1
 loadc 0
 3f8
 add 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 store 0 1
 loadc 1
 3f4
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
 3f5
 load 1 1
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 1
-1
+01
 loadc 0
-3f1
+03f1
 store 0 1
 loadc 0
-3f1
+03f1
 load 0 0
 loadc 1
-3f2
+03f2
 load 1 1
 sub 1 0
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 1
-3f2
+03f2
 load 1 1
 loadc 0
 3f8
 add 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 store 0 1
 loadc 1
 3f5
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-1
+01
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 0
-3f2
+03f2
 load 0 0
 loadc 1
-3f3
+03f3
 load 1 1
 sub 1 0
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
 3f5
 store 0 1
 loadc 1
-0
+00
 loadc 0
 goto3
 if 1 0
@@ -522,31 +522,31 @@ loadc 1
 3f6
 load 1 1
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-1
+01
 loadc 0
-3f2
+03f2
 store 0 1
 loadc 0
-3f2
+03f2
 load 0 0
 loadc 1
-3f3
+03f3
 load 1 1
 add 1 0
 loadc 0
-3f3
+03f3
 store 0 1
 loadc 1
-3f3
+03f3
 load 1 1
 loadc 0
 3f6
 store 0 1
 loadc 1
-0
+00
 loadc 0
 goto1
 if 1 0

@@ -328,7 +328,7 @@ public class MyCompiler {// Kevin
      * @return The multilined assembly code to load the value to the register
      */
     public String loadConst(int num, int reg) {
-        return "loadc " + Integer.toHexString(reg) + "\n" + Integer.toHexString(num) + "\n";
+        return "loadc " + Integer.toHexString(reg) + "\n0" + Integer.toHexString(num) + "\n";
     }
 
     /**
