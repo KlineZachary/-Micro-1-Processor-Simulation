@@ -134,7 +134,6 @@ public class Console {
 			}
 			cpu.setPC(0);
 			scan.close();
-			System.out.println("Assembled successfully");
 		} catch (Exception e) {
 			throw new Exception("ASM Error: " + e.getMessage() + " with line '" + current + "'");
 		}
@@ -198,7 +197,6 @@ public class Console {
 			}
 			assemblyLines.append("halt");
 			compiler.close();
-			System.out.println("Compiled successfully");
 
 		} catch (Exception e) {
 			// e.printStackTrace();
@@ -350,12 +348,15 @@ public class Console {
 					compiler = null;
 					hasHalt = false;
 					assemble(kbd.next());
+					System.out.println("Assembled successfully");
 					System.out.println("done");
 				} else if (cmmd.equals("cmp")) {
 					String path = kbd.next();
 					hasHalt = false;
 					compile(path);
+					System.out.println("Compiled successfully");
 					assemble(changeFileExtension(new File(path), ".asm"));
+					System.out.println("Assembled successfully");
 					System.out.println("done");
 				} else if (cmmd.equals("memory")) {
 					String dump = memory.dump();

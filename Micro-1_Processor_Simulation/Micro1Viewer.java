@@ -308,7 +308,6 @@ public class Micro1Viewer {
         // New out without the lines that have been run
         int PC = console.getCPU().getPC();
         for (int i = PC; i < arr.length; i++) {
-            System.out.println(arr[i]);
             if ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+")) {
                 break;
             }
