@@ -201,15 +201,15 @@ public class Micro1Viewer {
                 case 0:// machine code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         clear();
-                        machineString = getLinesAfter(console.load(fc.getSelectedFile().getAbsolutePath()));
+                        machineString = console.load(fc.getSelectedFile().getAbsolutePath());
                     }
                     break;
                 case 1:// assembly code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         clear();
-                        assemblyString = getLinesAfter(
-                                console.assemble(fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "")));
-                        machineString = getLinesAfter(console.getMemory().dumpInstructions());
+                        assemblyString = console
+                                .assemble(fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", ""));
+                        machineString = console.getMemory().dumpInstructions();
                     }
                     break;
                 case 2: // Compiler
@@ -218,8 +218,8 @@ public class Micro1Viewer {
                         path = fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "");
                         compileString = console.compile(path);
                         path = console.changeFileExtension(new File(path), ".asm");
-                        assemblyString = getLinesAfter(console.assemble(path));
-                        machineString = getLinesAfter(console.getMemory().dumpInstructions());
+                        assemblyString = console.assemble(path);
+                        machineString = console.getMemory().dumpInstructions();
                     }
 
                     break;
@@ -309,17 +309,22 @@ public class Micro1Viewer {
      * @return
      * @throws Exception
      */
-    public static String getLinesAfter(String lines) throws Exception {
+    public static String getLinesAfter(String lines, boolean isAssembly) throws Exception {
         String[] arr = lines.split("\n");
         StringBuilder out = new StringBuilder();
 
         // New out without the lines that have been run
         int PC = console.getCPU().getPC();
         for (int i = PC; i < arr.length; i++) {
-            if ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+")) {
+            if (!isAssembly
+                    && ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+"))) {
                 break;
             }
-            out.append(arr[i]).append("\n");
+            if (!arr[i].startsWith("label") && !arr[i].startsWith("goto"))
+                out.append(arr[i]).append("\n");
+        }
+        for (int i = 0; i < 15; i++) {
+            out.append("\n");
         }
 
         return out.toString();
@@ -355,9 +360,14 @@ public class Micro1Viewer {
      * Updates all text areas, and registers
      */
     public static void update() throws Exception {
-        String memory = console.getMemory().dump();
-        String assembly = getLinesAfter(assemblyString);
-        String machine = getLinesAfter(machineString);
+        String memory = "";
+        for (int i = 0; i < 15; i++) {
+            memory += "\n";
+        }
+        memory = console.getMemory().dump() + memory;
+
+        String assembly = getLinesAfter(assemblyString, true);
+        String machine = getLinesAfter(machineString, false);
         String[] allStrings = { compileString, assembly, machine, memory };
 
         // Update registers

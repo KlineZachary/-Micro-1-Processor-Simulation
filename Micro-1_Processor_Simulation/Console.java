@@ -89,27 +89,36 @@ public class Console {
 				if (token.matches("[0-9a-f]+") && !token.equals("add") && !token.matches("[0-9][0-9a-f]*")) {
 					throw new Exception("Hexidecimal constant starting digit is not 0-9");
 				}
-				out.append(token).append("\n");
+				out.append(token);
 				if (reachHalt) {
 					if (token.matches("[0-9a-f]+")) {
 						tokens.add(token);
+						out.append("\n");
 					} else {
 						throw new Exception("Invalid hexadecimal constant after halt");
 					}
 				} else if (token.startsWith("label")) {
 					assembler.insertLabel(Integer.parseInt(token.substring(5), 16), lineNum--);
-
+					out.append("\n");
 				} else {
 					tokens.add(token);
-					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add")))
+					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add"))) {
+						out.append("\n");
 						continue;
+					}
 					if (token.equals("halt")) {
 						reachHalt = true;
 						continue;
 					}
-					tokens.add(scan.next());
-					if (!token.equals("loadc"))
-						tokens.add(scan.next());
+					String next = scan.next();
+					tokens.add(next);
+					out.append(" ").append(next);
+					if (!token.equals("loadc")) {
+						next = scan.next();
+						tokens.add(next);
+						out.append(" ").append(next);
+					}
+					out.append("\n");
 				}
 
 			}
