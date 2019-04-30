@@ -200,11 +200,13 @@ public class Micro1Viewer {
                 // Chris=============
                 case 0:// machine code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        clear();
                         machineString = getLinesAfter(console.load(fc.getSelectedFile().getAbsolutePath()));
                     }
                     break;
                 case 1:// assembly code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        clear();
                         assemblyString = getLinesAfter(
                                 console.assemble(fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "")));
                         machineString = getLinesAfter(console.getMemory().dumpInstructions());
@@ -212,6 +214,7 @@ public class Micro1Viewer {
                     break;
                 case 2: // Compiler
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        clear();
                         path = fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "");
                         compileString = console.compile(path);
                         path = console.changeFileExtension(new File(path), ".asm");
@@ -328,7 +331,9 @@ public class Micro1Viewer {
 
     public static void step(int numSteps) throws Exception {
         for (int i = 0; i < numSteps; i++) {
+            System.out.println("Step: " + i);
             if (!console.step(1)) {
+                System.out.println("Program terminated");
                 return;
             }
             update();
@@ -343,6 +348,7 @@ public class Micro1Viewer {
         compileString = "";
         assemblyString = "";
         machineString = "";
+        console.reset();
         console.getCPU().clear();
         console.getMemory().clear();
     }

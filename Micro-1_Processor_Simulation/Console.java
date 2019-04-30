@@ -309,6 +309,12 @@ public class Console {
 		return true;
 	}
 
+	public void reset() {
+		assembler = null;
+		compiler = null;
+		hasHalt = false;
+	}
+
 	public Processor getCPU() {
 		return cpu;
 	}
@@ -340,20 +346,17 @@ public class Console {
 				} else if (cmmd.equals("help")) {
 					help();
 				} else if (cmmd.equals("load")) {
-					assembler = null;
-					compiler = null;
-					hasHalt = false;
+					reset();
 					load(kbd.next());
 					System.out.println("done");
 				} else if (cmmd.equals("asm")) {
-					compiler = null;
-					hasHalt = false;
+					reset();
 					assemble(kbd.next());
 					System.out.println("Assembled successfully");
 					System.out.println("done");
 				} else if (cmmd.equals("cmp")) {
 					String path = kbd.next();
-					hasHalt = false;
+					reset();
 					compile(path);
 					System.out.println("Compiled successfully");
 					assemble(changeFileExtension(new File(path), ".asm"));
