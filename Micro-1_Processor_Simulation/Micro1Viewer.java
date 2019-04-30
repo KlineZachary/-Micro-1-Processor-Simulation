@@ -216,7 +216,7 @@ public class Micro1Viewer {
                     }
 
                     break;
-                // Chris===========
+                // ===========
                 case 3:// Empty Text
                     clear();
                     break;
