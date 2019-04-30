@@ -331,9 +331,7 @@ public class Micro1Viewer {
 
     public static void step(int numSteps) throws Exception {
         for (int i = 0; i < numSteps; i++) {
-            System.out.println("Step: " + i);
             if (!console.step(1)) {
-                System.out.println("Program terminated");
                 return;
             }
             update();
