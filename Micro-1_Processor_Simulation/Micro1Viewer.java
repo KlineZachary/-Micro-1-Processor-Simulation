@@ -14,7 +14,6 @@ public class Micro1Viewer {
 
     // Vars
     static Console console = new Console(1024);
-
     static int textAreas = 4;
 
     static String machineString = "";
@@ -46,10 +45,20 @@ public class Micro1Viewer {
         frame.add(title);
 
         // Zach
-        String[] titles = { "MC", "ASM", "CMP", "✄", "⤻", "⤹", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
-        String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Empty Text", "Step",
-                "Dump Memory", "Display compiled var", "Display compiled arry", "Display all compiled vars",
-                "Debug each line", "Run entire file", "Help" };
+        String[] titles = { "MC", "ASM", "CMP", "✄", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
+        
+        String[] tooltips = { "Load Machine Code", 
+                              "Load Assembly", 
+                              "Load Compiler", 
+                              "Empty Text", 
+                              "Display compiled var", 
+                              "Display compiled arry", 
+                              "Display all compiled vars",
+                              "Debug each line", 
+                              "Run entire file", 
+                              "Help" };
+
+
         String[] labels = { "High Level Code", "Assembly Code", "Machine Code", "Memory" };
         Button.loadListener();
         Button.addAll(titles, tooltips, frame);
@@ -112,7 +121,7 @@ public class Micro1Viewer {
             click = new Clicklistener();
         }
 
-        // Button Properties
+        // Button Properties // Zach
         public Button(String title, String tooltip) {
             super(title);
             this.setBounds(x, y, length, length);// x axis, y axis, width, height
@@ -122,7 +131,7 @@ public class Micro1Viewer {
             x += dx;
         }
 
-        // Add Buttons to frame
+        // Add Buttons to frame // Zach
         static void addAll(String[] titles, String[] tooltips, JFrame frame) {
             for (int i = 0; i < titles.length; i++) {
                 // Create new row of buttons
@@ -180,8 +189,8 @@ public class Micro1Viewer {
 
     }
 
-    // Zach=============
-    // Button Actions
+    // Zach============= (Zach Did all actions except chris did  if statement for cases 0 - 2 that applies file chooser)
+    // Button Actions 
     static class Clicklistener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Button button = (Button) (e.getSource());
@@ -190,58 +199,61 @@ public class Micro1Viewer {
             String path, input;
 
             // Sets current directory to project location
-            fc.setCurrentDirectory(new java.io.File("."));
+            fc.setCurrentDirectory(new java.io.File(".")); // Chris
 
-            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY); //Chris
 
             try {
 
                 switch (button.tag) {
-                // Chris=============
+              
                 case 0:// machine code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        machineString = getLinesAfter(console.load(fc.getSelectedFile().getAbsolutePath()));
+                        clear();
+                        machineString = console.load(fc.getSelectedFile().getAbsolutePath());
                     }
                     break;
                 case 1:// assembly code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        assemblyString = getLinesAfter(console.assemble(fc.getSelectedFile().getAbsolutePath()));
-                        machineString = getLinesAfter(console.getMemory().dumpInstructions());
+                        clear();
+                        assemblyString = console
+                                .assemble(fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", ""));
+                        machineString = console.getMemory().dumpInstructions();
                     }
                     break;
                 case 2: // Compiler
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        compileString = getLinesAfter(console.compile(fc.getSelectedFile().getAbsolutePath()));
+                        clear();
+                        path = fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "");
+                        compileString = console.compile(path);
+                        path = console.changeFileExtension(new File(path), ".asm");
+                        assemblyString = console.assemble(path);
+                        machineString = console.getMemory().dumpInstructions();
                     }
 
                     break;
-                // ===========
+      
                 case 3:// Empty Text
                     clear();
                     break;
-                case 4:// Step //
-                       // REMOVE THIS SWITCH CASE
-                    break;
-                case 5:// Memory dumps to textArea
-                    break;
-                case 6: // prints out variable as chosen by user
+                case 4: // prints out variable as chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(),
                             "Enter the var name you would like to print");
                     JOptionPane.showMessageDialog(null, console.print(input), "Selected Var",
                             JOptionPane.DEFAULT_OPTION);
                     break;
-                case 7: // prints out array and length that is chosen by user
+                case 5: // prints out array and length that is chosen by user
                     input = JOptionPane.showInputDialog(button.getParent(), "Enter the array variable");
                     int sizeInput = (Integer.parseInt(JOptionPane.showInputDialog(button.getParent(),
                             "Enter the number of elements you would like to see")));
                     JOptionPane.showMessageDialog(null, console.getArr(input, sizeInput), "Selected Array and elements",
                             JOptionPane.DEFAULT_OPTION);
                     break;
-                case 8: // print all variables
+                case 6: // print all variables
                     JOptionPane.showMessageDialog(null, console.printAll(), "Variables", JOptionPane.DEFAULT_OPTION);
 
                     break;
-                case 9: // DEBUG
+                case 7: // DEBUG
                     if (!machineString.isEmpty()) {
                         step(1);
                     } else {
@@ -250,7 +262,7 @@ public class Micro1Viewer {
                     }
 
                     break;
-                case 10: // RUN
+                case 8: // RUN
                     if (!machineString.isEmpty()) {
                         step(Integer.MAX_VALUE);
                     } else {
@@ -259,11 +271,11 @@ public class Micro1Viewer {
 
                     }
                     break;
-                case 11:// Help //Edited by Chris
+                case 9:// Help //Edited by Chris
                     JOptionPane.showMessageDialog(null,
                             "Built for Computer Organization class taught by Dr. Zhu\nDeveloped By: Zachary A. Kline, Kevin Chevalier, and Christopher Aranda\n\n"
-                                    + "Help Catalog:\n\nMC: Loads a Machine Code File\nASM: Loads an assembly file\nCMP: Loads a compiler\n✄: Empty text\n"
-                                    + "⤻: Step\n⤹: Dumps memory into text field\nOUT: Displays the compiled variables\nARR: Displays the compiled array\nALL: Displays all compiled variables\n",
+                                    + "Help Catalog:\nMC: Loads a Machine Code File\nASM: Loads an assembly file\nCMP: Loads a High Language File\n✄: Empty text\n"
+                                    + "BUG:Runs through one line of machine code at a time\nRUN: Runs every line of machine code\nARR: Displays array chosen by user\nALL: Displays all compiled variables\n",
                             "The Micro-1 Processor Simulation", JOptionPane.INFORMATION_MESSAGE);
                     ;
                     break;
@@ -279,11 +291,11 @@ public class Micro1Viewer {
 
     // =======================================
     // Zach ==================================================
-    /**
-     * Create Input dialog for num of steps Then call step method with number that
+     /**
+      * Create Input dialog for num of steps Then call step method with number that
      * was inputed
-     * 
-     */
+      * @throws Exception
+      */
     public static void createInputDialog() throws Exception {
         String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
         int numSteps = Integer.parseInt(userInput);
@@ -301,26 +313,32 @@ public class Micro1Viewer {
      * @return
      * @throws Exception
      */
-    public static String getLinesAfter(String lines) throws Exception {
+    public static String getLinesAfter(String lines, boolean isAssembly) throws Exception {
         String[] arr = lines.split("\n");
         StringBuilder out = new StringBuilder();
 
         // New out without the lines that have been run
         int PC = console.getCPU().getPC();
         for (int i = PC; i < arr.length; i++) {
-            if ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+")) {
+            if (!isAssembly
+                    && ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+"))) {
                 break;
             }
-            out.append(arr[i]).append("\n");
+            if (!arr[i].startsWith("label") && !arr[i].startsWith("goto"))
+                out.append(arr[i]).append("\n");
+        }
+        for (int i = 0; i < 15; i++) {
+            out.append("\n");
         }
 
         return out.toString();
     }
 
-    /**
-     * Step through
-     */
-
+     /**
+      * Step through (execute instructions in memory)
+      * @param numSteps how many times you would like to step through
+      * @throws Exception
+      */
     public static void step(int numSteps) throws Exception {
         for (int i = 0; i < numSteps; i++) {
             if (!console.step(1)) {
@@ -332,23 +350,33 @@ public class Micro1Viewer {
     }
 
     /**
-     * Emptys all text areas with an empty string except memory
+     * Emptys all text areas with an empty strings
+     * Resets console
+     * Clears memory and registers
      */
     public static void clear() {
         compileString = "";
         assemblyString = "";
         machineString = "";
+        console.reset();
         console.getCPU().clear();
         console.getMemory().clear();
     }
 
     /**
-     * Updates all text areas, and registers
+     * Updates all text areas (HL,Assembly,MC, Mem), and registers
+     * * @throws Exception
      */
+
     public static void update() throws Exception {
-        String memory = console.getMemory().dump();
-        String assembly = getLinesAfter(assemblyString);
-        String machine = getLinesAfter(machineString);
+        String memory = "";
+        for (int i = 0; i < 15; i++) {
+            memory += "\n";
+        }
+        memory = console.getMemory().dump() + memory;
+
+        String assembly = getLinesAfter(assemblyString, true);
+        String machine = getLinesAfter(machineString, false);
         String[] allStrings = { compileString, assembly, machine, memory };
 
         // Update registers
@@ -362,8 +390,4 @@ public class Micro1Viewer {
         }
 
     }
-
-    // Cleaned up code so all the methods there were here arent needed feels like
-    // spring cleaning :)
-    // ============================================================================
 }

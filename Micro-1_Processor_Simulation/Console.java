@@ -89,27 +89,36 @@ public class Console {
 				if (token.matches("[0-9a-f]+") && !token.equals("add") && !token.matches("[0-9][0-9a-f]*")) {
 					throw new Exception("Hexidecimal constant starting digit is not 0-9");
 				}
-				out.append(token).append("\n");
+				out.append(token);
 				if (reachHalt) {
 					if (token.matches("[0-9a-f]+")) {
 						tokens.add(token);
+						out.append("\n");
 					} else {
 						throw new Exception("Invalid hexadecimal constant after halt");
 					}
 				} else if (token.startsWith("label")) {
 					assembler.insertLabel(Integer.parseInt(token.substring(5), 16), lineNum--);
-
+					out.append("\n");
 				} else {
 					tokens.add(token);
-					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add")))
+					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add"))) {
+						out.append("\n");
 						continue;
+					}
 					if (token.equals("halt")) {
 						reachHalt = true;
 						continue;
 					}
-					tokens.add(scan.next());
-					if (!token.equals("loadc"))
-						tokens.add(scan.next());
+					String next = scan.next();
+					tokens.add(next);
+					out.append(" ").append(next);
+					if (!token.equals("loadc")) {
+						next = scan.next();
+						tokens.add(next);
+						out.append(" ").append(next);
+					}
+					out.append("\n");
 				}
 
 			}
@@ -210,7 +219,8 @@ public class Console {
 	}
 
 	public String changeFileExtension(File file, String newExt) {
-		return file.getAbsolutePath().split("\\.")[0] + newExt;
+		String path = file.getAbsolutePath();
+		return path.substring(0, path.lastIndexOf(".")) + newExt;
 
 	}
 
@@ -308,6 +318,12 @@ public class Console {
 		return true;
 	}
 
+	public void reset() {
+		assembler = null;
+		compiler = null;
+		hasHalt = false;
+	}
+
 	public Processor getCPU() {
 		return cpu;
 	}
@@ -339,20 +355,17 @@ public class Console {
 				} else if (cmmd.equals("help")) {
 					help();
 				} else if (cmmd.equals("load")) {
-					assembler = null;
-					compiler = null;
-					hasHalt = false;
+					reset();
 					load(kbd.next());
 					System.out.println("done");
 				} else if (cmmd.equals("asm")) {
-					compiler = null;
-					hasHalt = false;
+					reset();
 					assemble(kbd.next());
 					System.out.println("Assembled successfully");
 					System.out.println("done");
 				} else if (cmmd.equals("cmp")) {
 					String path = kbd.next();
-					hasHalt = false;
+					reset();
 					compile(path);
 					System.out.println("Compiled successfully");
 					assemble(changeFileExtension(new File(path), ".asm"));
