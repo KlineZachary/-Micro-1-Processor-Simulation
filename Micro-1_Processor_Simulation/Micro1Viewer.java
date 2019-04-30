@@ -205,13 +205,18 @@ public class Micro1Viewer {
                     break;
                 case 1:// assembly code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        assemblyString = getLinesAfter(console.assemble(fc.getSelectedFile().getAbsolutePath()));
+                        assemblyString = getLinesAfter(
+                                console.assemble(fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "")));
                         machineString = getLinesAfter(console.getMemory().dumpInstructions());
                     }
                     break;
                 case 2: // Compiler
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        compileString = getLinesAfter(console.compile(fc.getSelectedFile().getAbsolutePath()));
+                        path = fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", "");
+                        compileString = console.compile(path);
+                        path = console.changeFileExtension(new File(path), ".asm");
+                        assemblyString = getLinesAfter(console.assemble(path));
+                        machineString = getLinesAfter(console.getMemory().dumpInstructions());
                     }
 
                     break;

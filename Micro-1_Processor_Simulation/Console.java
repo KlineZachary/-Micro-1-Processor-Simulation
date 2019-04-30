@@ -210,7 +210,8 @@ public class Console {
 	}
 
 	public String changeFileExtension(File file, String newExt) {
-		return file.getAbsolutePath().split("\\.")[0] + newExt;
+		String path = file.getAbsolutePath();
+		return path.substring(0, path.lastIndexOf(".")) + newExt;
 
 	}
 
