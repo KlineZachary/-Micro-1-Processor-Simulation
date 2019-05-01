@@ -1,11 +1,35 @@
 public class Processor {
+
+    /*
+        Number of registers
+    */
     private int[] reg = new int[8];
-    private int PC = 0;// the program counter, contains the address of the next instruction to execute.
-    private int IR = 0;// the instruction register, contains the hexadecimal representation of the
-                       // current instruction
+
+    /*
+        the program counter, contains the address of the next instruction to execute.
+        Initilize PC with 0
+    */
+    private int PC = 0;
+
+    /*
+        the instruction register, contains the hexadecimal representation of the
+        current instruction
+        Initilize IR with 0
+    */
+    private int IR = 0;
+
+    /*
+        Memory class instance
+    */
     private Memory memory;
 
-    public boolean step() throws Exception {// true = halt program
+
+    /**
+     * Execute each instruction register halt when IR == 0
+     * @return false = halt program
+     * @throws Exception 
+     */
+    public boolean step() throws Exception {
         // Kevin==============================================
         IR = memory.read(PC++);
         if (IR == 0)
@@ -15,6 +39,9 @@ public class Processor {
         // ==============================================
     }
 
+    /**
+     * Dump values in registers (in hex)
+     */
     public void dump() {// show all registers
         // Kevin==============================================
         for (int i = 0; i < reg.length; i++) {
@@ -25,6 +52,14 @@ public class Processor {
         // ==============================================
     }
 
+    /**
+     * Execute commands 
+     * P = command
+     * A = register index
+     * B = regiser index
+     * switch statments uses p to determine which exact command should be executed
+     * @throws Exception
+     */
     public void execute() throws Exception {
         // Kevin==============================================
         int b = IR & 15;// read first 4
@@ -137,13 +172,21 @@ public class Processor {
         }
     }
 
+    /**
+     * Clear each register with value 0
+     */
     public void clear() {// Kevin
         for (int i = 0; i < reg.length; i++) {
             reg[i] = 0;
         }
     }
 
-    ///// Think Zach
+
+    /**
+     * Dump all values in registers in the form of a string
+     * @return returns a string with all registers values (in hex)
+     */
+    /////Zach========================
     public String[] guiDump() {
         String[] regNumbers = new String[reg.length];
         for (int i = 0; i < 8; i++) {
@@ -152,36 +195,54 @@ public class Processor {
         return regNumbers;
 
     }
+    //==============================
 
     // Zach==============================================
+
+    /**
+     * Set memory object
+     * @param memory 
+     */
     public void setMemory(Memory memory) {
         this.memory = memory;
     }
 
-    public void setReg(int[] reg) {
-        this.reg = reg;
-    }
-
+    /**
+     * Set program counter
+     * @param PC
+     */
     public void setPC(int PC) {
         this.PC = PC;
     }
 
-    public void setIR(int IR) {
-        this.IR = IR;
-    }
-
+    /**
+     * Return register object
+     * @return regiser
+     */
     public int[] getReg() {
         return reg;
     }
 
+    /**
+     * Return Program counter
+     * @return program coutner
+     */
     public int getPC() {
         return PC;
     }
 
+    /**
+     * Return instruction register
+     * @return instruction register
+     */
     public int getIR() {
         return IR;
     }
 
+    /**
+     * Return memory object
+     * @return memory object
+     */
     public Memory getMemory() {
         return memory;
     }
