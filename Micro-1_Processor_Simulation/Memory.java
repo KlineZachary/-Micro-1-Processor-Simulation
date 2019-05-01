@@ -1,22 +1,51 @@
 public class Memory {
+    /**
+     * The capacity for memory
+     */
     private int cap;
+    /**
+     * The storage for memory
+     */
     private int[] cell = new int[cap];
 
-    // Do we need cap in initializer
+    /**
+     * Creates a new memory with a capacity
+     * 
+     * @param cap The capacity for memory
+     */
     public Memory(int cap) { // Zach I think
         this.cell = new int[this.cap = cap];
     }
 
+    /**
+     * Reads a value from an address in memory and returns it
+     * 
+     * @param addr The address to reference in memory
+     * @return The value in memory
+     * @throws Exception Invalid address
+     */
     public int read(int addr) throws Exception {
         isValidAddress(addr);
         return cell[addr]; // Zach
     }
 
+    /**
+     * Write a value to memory at a address
+     * 
+     * @param addr The address to reference in memory
+     * @param data The value to save to memory
+     * @throws Exception Invalid address
+     */
     public void write(int addr, int data) throws Exception {
         isValidAddress(addr);
         cell[addr] = data;// Kevin
     }
 
+    /**
+     * Retrieve all the values in memory with a hex representation Format: cell[#]=#
+     * 
+     * @return The values in memory with a formatted view
+     */
     public String dump() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < cap; i++) {// Kevin
@@ -27,6 +56,12 @@ public class Memory {
     }
 
     // Zach==============================================
+    /**
+     * Retrieve all the values in memory with a hex representation without
+     * formatting
+     * 
+     * @return The values in memory with a unformatted view
+     */
     public String dumpInstructions() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < cap; i++) {
@@ -35,26 +70,32 @@ public class Memory {
         return b.toString();
     }
 
+    /**
+     * Clear memory for GUI
+     */
     public void clear() {
         for (int i = 0; i < cap; i++) {
             cell[i] = 0;
         }
     }
 
-    public void setCap(int cap) {
-        this.cap = cap;
-    }
-
+    /**
+     * Get that capacity for memory
+     * 
+     * @return The capacity
+     */
     public int getCap() {
         return cap;
     }
 
-    public int[] getCells() {
-        return cell;
-    }
-    // Zach==============================================
-
     // Kevin==============================================
+
+    /**
+     * Verify if the address is valid
+     * 
+     * @param addr The address in check
+     * @throws Exception Invalid address
+     */
     public void isValidAddress(int addr) throws Exception {
         if (addr < 0 || addr >= cap)
             throw new Exception("Invalid memory access at " + addr);
