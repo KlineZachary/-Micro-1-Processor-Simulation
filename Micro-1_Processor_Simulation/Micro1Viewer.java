@@ -50,7 +50,7 @@ public class Micro1Viewer {
         String[] tooltips = { "Load Machine Code", 
                               "Load Assembly", 
                               "Load Compiler", 
-                              "Empty Text", 
+                              "Clear", 
                               "Display compiled var", 
                               "Display compiled arry", 
                               "Display all compiled vars",
@@ -69,7 +69,10 @@ public class Micro1Viewer {
 
         // Add labels
 
-        // Create multiple text areas and labels fro those text areas
+        // Create labels for textAreas and give them properties
+        //Give text area properties and give it a scroll pane
+        //Add lables and textAreas to frame
+
         int x = -240;
         int y = 240;
         for (int i = 0; i < textAreas; i++) {
@@ -98,6 +101,7 @@ public class Micro1Viewer {
         frame.setLayout(null);// using no layout managers
         frame.setVisible(true);// making the frame visible
 
+        //Update elements in frame
         try {
             update();
         } catch (Exception e) {
