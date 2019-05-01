@@ -105,14 +105,14 @@ public class Processor {
             if (debug)
                 System.out.println("REG[" + a + "] = << " + reg[b]);
 
-            reg[a] = reg[b] << 1;
+            reg[a] <<= reg[b];
 
             break;
         case 12:// rshift
             if (debug)
                 System.out.println("REG[" + a + "] = >> " + reg[b]);
 
-            reg[a] = reg[b] >> 1;
+            reg[a] >>= reg[b];
             break;
         case 13:// bwc
             if (debug)
