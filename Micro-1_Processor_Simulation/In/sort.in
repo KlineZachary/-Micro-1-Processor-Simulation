@@ -1,4 +1,0 @@
-cmp MyStuff/cmp.txt
-step 10000
-arr x 8
-quit
