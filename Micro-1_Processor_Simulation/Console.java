@@ -19,10 +19,19 @@ public class Console {
 	 */
 	private Processor cpu;
 
+	/**
+	 * Assembler of the simulated computer
+	 */
 	private Assembler assembler;
 
+	/**
+	 * Compiler of the simulated computer
+	 */
 	private MyCompiler compiler;
 
+	/**
+	 * Determines if the program has halted (Machine Code)
+	 */
 	private boolean hasHalt = false;
 
 	// Zach =============
@@ -67,42 +76,49 @@ public class Console {
 		return out.toString();
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param fName the name of a file containing assembly code
-	 */
 	// Kevin==============================================
-
+	/**
+	 * Loads assembly code stored in fName into memory starting at address 0. Resets
+	 * PC to 0.
+	 * 
+	 * @param fName The name of a file containing assembly code
+	 * @return The contents of the file as a string (GUI use)
+	 * @throws Exception Invalid line during assembly translation
+	 */
 	public String assemble(String fName) throws Exception {
-		String current = "";
-		StringBuilder out = new StringBuilder();
+		String current = "";// Current line - printed when handling exceptions
+		StringBuilder out = new StringBuilder();// stores contents of the file
 		try {
 			File f = new File(fName);
 			Scanner scan = new Scanner(f);
 			assembler = new Assembler();
 			int address = 0;
-			ArrayList<String> tokens = new ArrayList<String>();
-			boolean reachHalt = false;
-			for (int lineNum = 0; scan.hasNext(); lineNum++) {
+			ArrayList<String> tokens = new ArrayList<String>();// stores file content as tokens
+			boolean reachHalt = false;// reach halt -> read input as hexadecimal constants
+			for (int lineNum = 0; scan.hasNext(); lineNum++) {// first pass - get addresses for labels + store file
+																// contents to arraylist
 				String token = current = scan.next();
-				if (token.matches("[0-9a-f]+") && !token.equals("add") && !token.matches("[0-9][0-9a-f]*")) {
+				if (token.matches("[0-9a-f]+") && !token.equals("add") && !token.matches("[0-9][0-9a-f]*")) {// detect
+																												// invalid
+																												// hex
 					throw new Exception("Hexidecimal constant starting digit is not 0-9");
 				}
 				out.append(token);
-				if (reachHalt) {
+				if (reachHalt) {// read input as hexdecimal
 					if (token.matches("[0-9a-f]+")) {
 						tokens.add(token);
 						out.append("\n");
-					} else {
+					} else {// non hex found
 						throw new Exception("Invalid hexadecimal constant after halt");
 					}
-				} else if (token.startsWith("label")) {
-					assembler.insertLabel(Integer.parseInt(token.substring(5), 16), lineNum--);
+				} else if (token.startsWith("label")) {// store addresses for labels
+					assembler.insertLabel(token.substring(5), lineNum--);
 					out.append("\n");
 				} else {
 					tokens.add(token);
-					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add"))) {
+					if (token.startsWith("goto") || (token.matches("[0-9a-f]+") && !token.equals("add"))) {// tokens(commands)
+																											// without
+																											// parameters
 						out.append("\n");
 						continue;
 					}
@@ -110,10 +126,11 @@ public class Console {
 						reachHalt = true;
 						continue;
 					}
+					// addition parameters - most require 2
 					String next = scan.next();
 					tokens.add(next);
 					out.append(" ").append(next);
-					if (!token.equals("loadc")) {
+					if (!token.equals("loadc")) {// loadc - requires only 1 parameter
 						next = scan.next();
 						tokens.add(next);
 						out.append(" ").append(next);
@@ -122,16 +139,17 @@ public class Console {
 				}
 
 			}
-			for (int i = 0; i < tokens.size();) {
+			for (int i = 0; i < tokens.size();) {// second pass - go through tokens and write to memory
 				String instr = current = tokens.get(i++);
-				if (instr.startsWith("goto")) {
-					memory.write(address++, assembler.getLine(Integer.parseInt(instr.substring(4), 16)));
+				if (instr.startsWith("goto")) {// handle goto
+					memory.write(address++, assembler.getLine(instr.substring(4)));
 					continue;
 				}
-				if (instr.matches("[0-9a-f]+") && !instr.equals("add")) {
+				if (instr.matches("[0-9a-f]+") && !instr.equals("add")) {// handle constant
 					memory.write(address++, Integer.parseInt(instr, 16));
 					continue;
 				}
+				// halt/loadc - do not have 2 parameters
 				int a = instr.equals("halt") ? 0 : Integer.parseInt(tokens.get(i++));
 				int b = instr.matches("halt|loadc") ? 0 : Integer.parseInt(tokens.get(i++));
 				current = instr + " " + Integer.toHexString(a) + " " + Integer.toHexString(b);
@@ -144,44 +162,52 @@ public class Console {
 			cpu.setPC(0);
 			scan.close();
 		} catch (Exception e) {
-			throw new Exception("ASM Error: " + e.getMessage() + " with line '" + current + "'");
+			throw new Exception("ASM Error: " + e.getMessage() + " with line '" + current + "'");// propagate message
+																									// forward
 		}
 		return out.toString();
 	}
 
+	/**
+	 * 
+	 * @param fName The name of a file containing high level code
+	 * @return The contents of the file as a string (GUI use)
+	 * @throws Exception Invalid line during compiling
+	 */
 	public String compile(String fName) throws Exception {
-		int lineNumber = 0;
-		String line = "";
+		int lineNumber = 0;// track linenumber for exception
+		String line = "";// track line content for exception
 		File f = new File(fName);
-		StringBuilder linesBuilder = new StringBuilder();
-		StringBuilder assemblyLines = new StringBuilder();
+		StringBuilder linesBuilder = new StringBuilder();// output for gui
+		StringBuilder assemblyLines = new StringBuilder();// storing assembly code to file
 		try {
 
 			Scanner scan = new Scanner(f);
 			compiler = new MyCompiler(memory.getCap());
 			while (scan.hasNext()) {
-				line = scan.nextLine().replaceAll("\\s+", "");
+				line = scan.nextLine().replaceAll("\\s+", "");// remove all whitespace
 				if (line.length() > 0) {
 					if (!line.endsWith(";"))
 						throw new Exception("missing ';'");
-					if ((line.matches(".*[0-9a-zA-Z\\[\\]] [0-9a-zA-Z\\[\\]].*")))
+					if ((line.matches(".*[0-9a-zA-Z\\[\\]] [0-9a-zA-Z\\[\\]].*")))// only letters, numbers,[]s found
 						throw new Exception("missing operator");
-					linesBuilder.append(line).append("\n");
+					linesBuilder.append(line).append("\n");// add new line back to separate lines until split by ';'
 				}
 			}
 			scan.close();
-			String[] lines = linesBuilder.toString().replace("true", "1").replace("false", "0").replace("\n", "")
+			String[] lines = linesBuilder.toString().replace("true", "1").replace("false", "0").replace("\n", "")// standardizing
 					.split(";");
 			while (lineNumber < lines.length) {
 				line = lines[lineNumber];
 				boolean isArrayDeclaration = false;
-				String[] parts = compiler.divideStatement(line);
+				String[] parts = compiler.divideStatement(line);// divide statement by equal sign. variable and
+																// expression
 				if (parts != null) {
-					String var = parts[0];
-					if (compiler.isIndexed(var))
-						var = compiler.divideIndexedVariable(var)[0];
+					String var = parts[0];// first part is variable
+					if (compiler.isIndexed(var))// check if variable has [...]s
+						var = compiler.divideIndexedVariable(var)[0];// remove [...] part
 					int size = 1;
-					if (line.matches(".*\\[\\].*")) {
+					if (line.matches(".*\\[\\].*")) {// an array declaration
 						if (line.matches("[0-9a-zA-Z]+\\[\\]=.*[a-zA-Z].*")) {
 							throw new Exception("Array declaration must include a constant length");
 						}
@@ -189,15 +215,17 @@ public class Console {
 							throw new Exception("Invalid array declaration.");
 						}
 						isArrayDeclaration = true;
-						int arrLen = Integer.parseInt(parts[1]);
-						size = arrLen;
+						size = Integer.parseInt(parts[1]);
+						if (size <= 0) {
+							throw new Exception("Array declaration must have a positive length: '" + size + "'");
+						}
 					}
-					if (!compiler.containsVariable(var)) {
+					if (!compiler.containsVariable(var)) {// add array as variable with a length
 						compiler.insertVariable(var, size);
 					}
 				}
-				if (!isArrayDeclaration) {
-					String evaluated = compiler.evaluate(line, 1, 0);
+				if (!isArrayDeclaration) {// do not evaluate array declarations
+					String evaluated = compiler.evaluate(line, 1, 0);// evaluate equation
 					if (evaluated.length() > 0) {
 						assemblyLines.append(evaluated);
 					}
@@ -210,14 +238,22 @@ public class Console {
 		} catch (Exception e) {
 			// e.printStackTrace();
 			throw new Exception("Compile Error: " + e.getMessage() + " at line " + lineNumber + ": '" + line + "'");
+			// propagate message forward
 		}
 		// String asmName = "assembled.assm";
-		PrintWriter writer = new PrintWriter(changeFileExtension(f, ".asm"));
+		PrintWriter writer = new PrintWriter(changeFileExtension(f, ".asm"));// save assembly to file with same name
 		writer.println(assemblyLines.toString());
 		writer.close();
 		return linesBuilder.toString();
 	}
 
+	/**
+	 * Changes extension of a file name
+	 * 
+	 * @param file   The file with the original file name
+	 * @param newExt The new extension
+	 * @return A string with the previous file's path and the new extension
+	 */
 	public String changeFileExtension(File file, String newExt) {
 		String path = file.getAbsolutePath();
 		return path.substring(0, path.lastIndexOf(".")) + newExt;
