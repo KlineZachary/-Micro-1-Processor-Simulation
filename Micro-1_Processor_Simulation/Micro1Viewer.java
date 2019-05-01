@@ -46,18 +46,9 @@ public class Micro1Viewer {
 
         // Zach
         String[] titles = { "MC", "ASM", "CMP", "✄", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
-        
-        String[] tooltips = { "Load Machine Code", 
-                              "Load Assembly", 
-                              "Load Compiler", 
-                              "Clear", 
-                              "Display compiled var", 
-                              "Display compiled arry", 
-                              "Display all compiled vars",
-                              "Debug each line", 
-                              "Run entire file", 
-                              "Help" };
 
+        String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Clear", "Display compiled var",
+                "Display compiled arry", "Display all compiled vars", "Debug each line", "Run entire file", "Help" };
 
         String[] labels = { "High Level Code", "Assembly Code", "Machine Code", "Memory" };
         Button.loadListener();
@@ -70,8 +61,8 @@ public class Micro1Viewer {
         // Add labels
 
         // Create labels for textAreas and give them properties
-        //Give text area properties and give it a scroll pane
-        //Add lables and textAreas to frame
+        // Give text area properties and give it a scroll pane
+        // Add lables and textAreas to frame
 
         int x = -240;
         int y = 240;
@@ -101,7 +92,7 @@ public class Micro1Viewer {
         frame.setLayout(null);// using no layout managers
         frame.setVisible(true);// making the frame visible
 
-        //Update elements in frame
+        // Update elements in frame
         try {
             update();
         } catch (Exception e) {
@@ -193,8 +184,9 @@ public class Micro1Viewer {
 
     }
 
-    // Zach============= (Zach Did all actions except chris did  if statement for cases 0 - 2 that applies file chooser)
-    // Button Actions 
+    // Zach============= (Zach Did all actions except chris did if statement for
+    // cases 0 - 2 that applies file chooser)
+    // Button Actions
     static class Clicklistener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Button button = (Button) (e.getSource());
@@ -205,12 +197,12 @@ public class Micro1Viewer {
             // Sets current directory to project location
             fc.setCurrentDirectory(new java.io.File(".")); // Chris
 
-            fc.setFileSelectionMode(JFileChooser.FILES_ONLY); //Chris
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY); // Chris
 
             try {
 
                 switch (button.tag) {
-              
+
                 case 0:// machine code
                     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         clear();
@@ -236,7 +228,7 @@ public class Micro1Viewer {
                     }
 
                     break;
-      
+
                 case 3:// Empty Text
                     clear();
                     break;
@@ -267,7 +259,16 @@ public class Micro1Viewer {
 
                     break;
                 case 8: // RUN
+                    //Options for joption pan
+                    Object[] options = new Object[] { "Run" };
+
                     if (!machineString.isEmpty()) {
+                        // Give user warning then when they click "run" the program will run
+                        JOptionPane.showOptionDialog(frame,
+                                "Depending how many commands need to be run it could take a little longer so be patient :)",
+                                "Loading", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                                options, options[0]);
+
                         step(Integer.MAX_VALUE);
                     } else {
                         JOptionPane.showMessageDialog(null, "No machine code to run", "Error",
@@ -295,11 +296,12 @@ public class Micro1Viewer {
 
     // =======================================
     // Zach ==================================================
-     /**
-      * Create Input dialog for num of steps Then call step method with number that
+    /**
+     * Create Input dialog for num of steps Then call step method with number that
      * was inputed
-      * @throws Exception
-      */
+     * 
+     * @throws Exception
+     */
     public static void createInputDialog() throws Exception {
         String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
         int numSteps = Integer.parseInt(userInput);
@@ -338,11 +340,12 @@ public class Micro1Viewer {
         return out.toString();
     }
 
-     /**
-      * Step through (execute instructions in memory)
-      * @param numSteps how many times you would like to step through
-      * @throws Exception
-      */
+    /**
+     * Step through (execute instructions in memory)
+     * 
+     * @param numSteps how many times you would like to step through
+     * @throws Exception
+     */
     public static void step(int numSteps) throws Exception {
         for (int i = 0; i < numSteps; i++) {
             if (!console.step(1)) {
@@ -354,9 +357,8 @@ public class Micro1Viewer {
     }
 
     /**
-     * Emptys all text areas with an empty strings
-     * Resets console
-     * Clears memory and registers
+     * Emptys all text areas with an empty strings Resets console Clears memory and
+     * registers
      */
     public static void clear() {
         compileString = "";
@@ -368,8 +370,8 @@ public class Micro1Viewer {
     }
 
     /**
-     * Updates all text areas (HL,Assembly,MC, Mem), and registers
-     * * @throws Exception
+     * Updates all text areas (HL,Assembly,MC, Mem), and registers * @throws
+     * Exception
      */
 
     public static void update() throws Exception {
@@ -394,4 +396,5 @@ public class Micro1Viewer {
         }
 
     }
+
 }
