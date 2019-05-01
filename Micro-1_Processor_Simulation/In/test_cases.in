@@ -1,4 +1,0 @@
-cmp In/test_cases.txt
-step 10000
-allout
-quit

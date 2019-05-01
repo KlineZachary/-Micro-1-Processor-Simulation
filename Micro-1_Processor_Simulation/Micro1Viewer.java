@@ -45,7 +45,7 @@ public class Micro1Viewer {
         frame.add(title);
 
         // Zach
-        String[] titles = { "MC", "ASM", "CMP", "✄", "OUT", "ARR", "ALL", "BUG", "RUN", "?" };
+        String[] titles = { "MC", "ASM", "CMP", "✄", "OUT", "ARR", "ALL", "STEP", "RUN", "?" };
 
         String[] tooltips = { "Load Machine Code", "Load Assembly", "Load Compiler", "Clear", "Display compiled var",
                 "Display compiled arry", "Display all compiled vars", "Debug each line", "Run entire file", "Help" };
@@ -130,7 +130,7 @@ public class Micro1Viewer {
         static void addAll(String[] titles, String[] tooltips, JFrame frame) {
             for (int i = 0; i < titles.length; i++) {
                 // Create new row of buttons
-                if (i % 6 == 0) {
+                if (i % 5 == 0) {
                     y += 50;
                     x = constantX;
                 }
@@ -190,7 +190,6 @@ public class Micro1Viewer {
     static class Clicklistener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Button button = (Button) (e.getSource());
-            JButton open = new JButton(); // Creat button
             JFileChooser fc = new JFileChooser(); // Create File chooser
             String path, input;
 
@@ -251,7 +250,7 @@ public class Micro1Viewer {
                     break;
                 case 7: // DEBUG
                     if (!machineString.isEmpty()) {
-                        step(1);
+                        console.step(1);
                     } else {
                         JOptionPane.showMessageDialog(null, "No machine code to run", "Error",
                                 JOptionPane.ERROR_MESSAGE);
@@ -259,17 +258,10 @@ public class Micro1Viewer {
 
                     break;
                 case 8: // RUN
-                    //Options for joption pan
-                    Object[] options = new Object[] { "Run" };
-
+             
                     if (!machineString.isEmpty()) {
-                        // Give user warning then when they click "run" the program will run
-                        JOptionPane.showOptionDialog(frame,
-                                "Depending how many commands need to be run it could take a little longer so be patient :)",
-                                "Loading", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                                options, options[0]);
-
-                        step(Integer.MAX_VALUE);
+            
+                        console.step(Integer.MAX_VALUE);
                     } else {
                         JOptionPane.showMessageDialog(null, "No machine code to run", "Error",
                                 JOptionPane.ERROR_MESSAGE);
@@ -280,7 +272,7 @@ public class Micro1Viewer {
                     JOptionPane.showMessageDialog(null,
                             "Built for Computer Organization class taught by Dr. Zhu\nDeveloped By: Zachary A. Kline, Kevin Chevalier, and Christopher Aranda\n\n"
                                     + "Help Catalog:\nMC: Loads a Machine Code File\nASM: Loads an assembly file\nCMP: Loads a High Language File\n✄: Empty text\n"
-                                    + "BUG:Runs through one line of machine code at a time\nRUN: Runs every line of machine code\nARR: Displays array chosen by user\nALL: Displays all compiled variables\n",
+                                    + "Step:Runs through one line of machine code at a time\nRUN: Runs every line of machine code\nARR: Displays array chosen by user\nALL: Displays all compiled variables\n",
                             "The Micro-1 Processor Simulation", JOptionPane.INFORMATION_MESSAGE);
                     ;
                     break;
@@ -296,17 +288,6 @@ public class Micro1Viewer {
 
     // =======================================
     // Zach ==================================================
-    /**
-     * Create Input dialog for num of steps Then call step method with number that
-     * was inputed
-     * 
-     * @throws Exception
-     */
-    public static void createInputDialog() throws Exception {
-        String userInput = JOptionPane.showInputDialog("Please enter number of steps you would like to execute");
-        int numSteps = Integer.parseInt(userInput);
-        step(numSteps);
-    }
 
     /**
      * Get lines of machine code based on is it is debuging or not If debuging then
@@ -340,21 +321,6 @@ public class Micro1Viewer {
         return out.toString();
     }
 
-    /**
-     * Step through (execute instructions in memory)
-     * 
-     * @param numSteps how many times you would like to step through
-     * @throws Exception
-     */
-    public static void step(int numSteps) throws Exception {
-        for (int i = 0; i < numSteps; i++) {
-            if (!console.step(1)) {
-                return;
-            }
-            update();
-        }
-        return;
-    }
 
     /**
      * Emptys all text areas with an empty strings Resets console Clears memory and
