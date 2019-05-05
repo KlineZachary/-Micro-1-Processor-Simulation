@@ -1,0 +1,16 @@
+a = 3;
+b = 5;
+c = 13;
+d = 23;
+e = 210;
+
+x = (((((b + a)*(e + (b & a)))/c)>>a)-(d|c))<<a;
+step1 = b + a;
+step2 = b & a;
+step3 = e + step2;
+step4 = step 1 * step3;
+step5 = step4 / c;
+step6 = step5 >> a;
+step7 = d | c;
+step8 = step6 - step7;
+solution = step8<<a;

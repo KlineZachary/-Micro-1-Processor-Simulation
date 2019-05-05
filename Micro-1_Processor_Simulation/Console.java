@@ -97,15 +97,15 @@ public class Console {
 			boolean reachHalt = false;// reach halt -> read input as hexadecimal constants
 			for (int lineNum = 0; scan.hasNext(); lineNum++) {// first pass - get addresses for labels + store file
 																// contents to arraylist
-				String token = current = scan.next();
+				String token = current = scan.next().toLowerCase();
 				if (token.matches("[0-9a-f]+") && !token.equals("add") && !token.matches("[0-9][0-9a-f]*")) {// detect
 																												// invalid
 																												// hex
 					throw new Exception("Hexidecimal constant starting digit is not 0-9");
 				}
 				out.append(token);
-				if (reachHalt) {// read input as hexdecimal
-					if (token.matches("[0-9a-f]+")) {
+				if (reachHalt) {// has halted -> must be hex
+					if (token.matches("[0-9a-f]+")) {// read input as hexdecimal
 						tokens.add(token);
 						out.append("\n");
 					} else {// non hex found
@@ -127,11 +127,11 @@ public class Console {
 						continue;
 					}
 					// addition parameters - most require 2
-					String next = scan.next();
+					String next = scan.next().toLowerCase();
 					tokens.add(next);
 					out.append(" ").append(next);
 					if (!token.equals("loadc")) {// loadc - requires only 1 parameter
-						next = scan.next();
+						next = scan.next().toLowerCase();
 						tokens.add(next);
 						out.append(" ").append(next);
 					}
@@ -152,7 +152,7 @@ public class Console {
 				// halt/loadc - do not have 2 parameters
 				int a = instr.equals("halt") ? 0 : Integer.parseInt(tokens.get(i++));
 				int b = instr.matches("halt|loadc") ? 0 : Integer.parseInt(tokens.get(i++));
-				current = instr + " " + Integer.toHexString(a) + " " + Integer.toHexString(b);
+				current = instr + " " + String.format("%08x", a) + " " + String.format("%08x", b);
 				// System.out.println(address + ". " + instr + " " + a + " " + b);
 				memory.write(address++, assembler.translate(instr, a, b));
 				if (address >= memory.getCap()) {
@@ -354,10 +354,17 @@ public class Console {
 		return true;
 	}
 
+	/**
+	 * Reset the assembler and compiler so the variables do not continue Reset the
+	 * halt variable - it will read instructions again Clear all memory - prevent
+	 * issues when running several programs Clear all registers- prevent issues
+	 */
 	public void reset() {
 		assembler = null;
 		compiler = null;
 		hasHalt = false;
+		memory.clear();
+		cpu.clear();
 	}
 
 	public Processor getCPU() {
@@ -385,7 +392,7 @@ public class Console {
 		while (true) {
 			try {
 				System.out.print("-> ");
-				String cmmd = kbd.next();
+				String cmmd = kbd.next().toLowerCase();
 				if (cmmd.equals("quit")) {
 					break;
 				} else if (cmmd.equals("help")) {

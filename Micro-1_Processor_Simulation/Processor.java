@@ -1,33 +1,32 @@
 public class Processor {
 
     /*
-        Number of registers
-    */
+     * Number of registers
+     */
     private int[] reg = new int[8];
 
     /*
-        the program counter, contains the address of the next instruction to execute.
-        Initilize PC with 0
-    */
+     * the program counter, contains the address of the next instruction to execute.
+     * Initilize PC with 0
+     */
     private int PC = 0;
 
     /*
-        the instruction register, contains the hexadecimal representation of the
-        current instruction
-        Initilize IR with 0
-    */
+     * the instruction register, contains the hexadecimal representation of the
+     * current instruction Initilize IR with 0
+     */
     private int IR = 0;
 
     /*
-        Memory class instance
-    */
+     * Memory class instance
+     */
     private Memory memory;
-
 
     /**
      * Execute each instruction register halt when IR == 0
+     * 
      * @return false = halt program
-     * @throws Exception 
+     * @throws Exception
      */
     public boolean step() throws Exception {
         // Kevin==============================================
@@ -45,19 +44,17 @@ public class Processor {
     public void dump() {// show all registers
         // Kevin==============================================
         for (int i = 0; i < reg.length; i++) {
-            System.out.println("reg[" + Integer.toString(i) + "] = " + Integer.toHexString(reg[i]));
+            System.out.println("reg[" + Integer.toString(i) + "] = " + String.format("%08x", reg[i]));
         }
-        System.out.println("PC = " + Integer.toHexString(PC));
-        System.out.println("IR = " + Integer.toHexString(IR));
+        System.out.println("PC = " + String.format("%08x", PC));
+        System.out.println("IR = " + String.format("%08x", IR));
         // ==============================================
     }
 
     /**
-     * Execute commands 
-     * P = command
-     * A = register index
-     * B = regiser index
-     * switch statments uses p to determine which exact command should be executed
+     * Execute commands P = command A = register index B = regiser index switch
+     * statments uses p to determine which exact command should be executed
+     * 
      * @throws Exception
      */
     public void execute() throws Exception {
@@ -181,27 +178,28 @@ public class Processor {
         }
     }
 
-
     /**
      * Dump all values in registers in the form of a string
+     * 
      * @return returns a string with all registers values (in hex)
      */
-    /////Zach========================
+    ///// Zach========================
     public String[] guiDump() {
         String[] regNumbers = new String[reg.length];
         for (int i = 0; i < 8; i++) {
-            regNumbers[i] = Integer.toHexString(reg[i]);
+            regNumbers[i] = String.format("%08x", reg[i]);
         }
         return regNumbers;
 
     }
-    //==============================
+    // ==============================
 
     // Zach==============================================
 
     /**
      * Set memory object
-     * @param memory 
+     * 
+     * @param memory
      */
     public void setMemory(Memory memory) {
         this.memory = memory;
@@ -209,6 +207,7 @@ public class Processor {
 
     /**
      * Set program counter
+     * 
      * @param PC
      */
     public void setPC(int PC) {
@@ -216,16 +215,18 @@ public class Processor {
     }
 
     /**
-     * Return register object
-     * @return regiser
+     * Return the value of register at index
+     * 
+     * @return value in register
      */
-    public int[] getReg() {
-        return reg;
+    public int read(int index) {
+        return reg[index];
     }
 
     /**
      * Return Program counter
-     * @return program coutner
+     * 
+     * @return program counter
      */
     public int getPC() {
         return PC;
@@ -233,6 +234,7 @@ public class Processor {
 
     /**
      * Return instruction register
+     * 
      * @return instruction register
      */
     public int getIR() {
@@ -241,6 +243,7 @@ public class Processor {
 
     /**
      * Return memory object
+     * 
      * @return memory object
      */
     public Memory getMemory() {

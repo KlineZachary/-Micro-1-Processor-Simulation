@@ -9,12 +9,19 @@ public class Memory {
     private int[] cell = new int[cap];
 
     /**
+     * The number of hex digits needed to represent the addresses Used for display
+     * only
+     */
+    private int hexDigitCount;
+
+    /**
      * Creates a new memory with a capacity
      * 
      * @param cap The capacity for memory
      */
     public Memory(int cap) { // Zach I think
         this.cell = new int[this.cap = cap];
+        hexDigitCount = Integer.toHexString(cap).length();
     }
 
     /**
@@ -49,8 +56,8 @@ public class Memory {
     public String dump() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < cap; i++) {// Kevin
-            b.append("cell[").append(Integer.toHexString(i)).append("] = ").append(Integer.toHexString(cell[i]))
-                    .append("\n");
+            b.append("cell[").append(String.format("%0" + hexDigitCount + "x", i)).append("] = ")
+                    .append(String.format("%08x", cell[i])).append("\n");
         }
         return b.toString();
     }
@@ -65,7 +72,7 @@ public class Memory {
     public String dumpInstructions() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < cap; i++) {
-            b.append(Integer.toHexString(cell[i])).append("\n");
+            b.append(String.format("%08x", cell[i])).append("\n");
         }
         return b.toString();
     }

@@ -667,14 +667,38 @@ public class MyCompiler {// Kevin
     }
 
     /**
-     * Assembly code for bitwise oring two values in registers
+     * Assembly code for bitwise ORing two values in registers
      * 
      * @param regA The register that holds the first value
      * @param regB The register that holds the second value
-     * @return The assembly code for bitwise oring two registers
+     * @return The assembly code for bitwise ORing two registers
      */
     public String bitOr(int regA, int regB) {
         return "bwd " + regA + " " + regB + "\n";
+    }
+
+    /**
+     * Assembly code for bitwise ANDing two values in registers
+     * 
+     * @param regA The register that holds the first value
+     * @param regB The register that holds the second value
+     * @return The assembly code for bitwise ANDing two registers
+     */
+    public String bitAnd(int regA, int regB) {
+        return "bwc " + regA + " " + regB + "\n";
+    }
+
+    /**
+     * Converts any nonzero number to a positive number Zero will remain zero
+     * 
+     * @param reg     The register that holds the value and will hold the result
+     * @param tempReg A temporary register for computations
+     * @return The assembly code for converting any nonzero number to a positive
+     *         number
+     */
+    public String toPostive(int reg, int tempReg) {
+        return loadConst(0x7FFFFFFF, tempReg) + bitAnd(reg, tempReg);// sets the leftmost bit in reg to 0 of a 32 bit
+                                                                     // number
     }
 
     /**
@@ -689,10 +713,10 @@ public class MyCompiler {// Kevin
     }
 
     /**
-     * Toogles a boolean in a register
+     * Toggles a boolean in a register
      * 
-     * @param reg The register that holds the obolean
-     * @return The assembly code for noting the register
+     * @param reg The register that holds the boolean
+     * @return The assembly code for NOTing the register
      */
     public String not(int reg) {
         return not(reg, reg);
@@ -703,7 +727,7 @@ public class MyCompiler {// Kevin
      * 
      * @param ansReg The register that stores the result
      * @param reg    The register that holds the inital value
-     * @return The assembly code for noting a value to a register
+     * @return The assembly code for NOTing a value to a register
      */
     public String not(int ansReg, int reg) {
         return "not " + ansReg + " " + reg + "\n";
@@ -756,7 +780,7 @@ public class MyCompiler {// Kevin
      *         true otherwise less then 1
      */
     public String equalTo(int regA, int regB) {
-        return greaterThan(regA, regB) + not(regA);// a=!(a-b)
+        return notEqual(regA, regB) + not(regA);// a=!(a!=b)
     }
 
     /**
@@ -769,12 +793,11 @@ public class MyCompiler {// Kevin
      *         true otherwise less then 1
      */
     public String notEqual(int regA, int regB) {
-        return equalTo(regA, regB) + not(regA);// a=!!(a-b)//This works because either it is nonzero -> zero -> one or
-                                               // zero -> one -> zero
+        return sub(regA, regB) + toPostive(regA, regB);// a = postiveValue(a-b)//not absolute value
     }
 
     /**
-     * Determines if a register is less than or equal toanother register and stores
+     * Determines if a register is less than or equal to another register and stores
      * the result in regA
      * 
      * @param regA The register for comparision and storing the result
@@ -783,11 +806,7 @@ public class MyCompiler {// Kevin
      *         true otherwise less then 1
      */
     public String lessEqual(int regA, int regB) {
-        StringBuilder out = new StringBuilder();
-        out.append(lessThan(regA, regB));// if regA < regB ? regA > 0 else regA <= 0
-        out.append(loadConst(1, regB));
-        out.append(bitOr(regA, regB));// (+ -> + or - -> - or 0 -> +)
-        return out.toString();
+        return greaterThan(regA, regB) + not(regA);// a = !(a>b)
     }
 
     /**
@@ -800,11 +819,8 @@ public class MyCompiler {// Kevin
      *         true otherwise less then 1
      */
     public String greaterEqual(int regA, int regB) {
-        StringBuilder out = new StringBuilder();
-        out.append(greaterThan(regA, regB));// if regA > regB ? regA > 0 else regA <= 0
-        out.append(loadConst(1, regB));
-        out.append(bitOr(regA, regB));// (+ -> + or - -> - or 0 -> +)
-        return out.toString();
+        return lessThan(regA, regB) + not(regA);// a = !(a<b)
+
     }
 
     /**
@@ -816,7 +832,7 @@ public class MyCompiler {// Kevin
      * @throws Exception The name of variable is invalid
      */
     public void insertVariable(String var, int size) throws Exception {
-        if (isReserved(var) || !var.matches("[a-zA-Z]+[a-zA-Z0-9]*"))
+        if (isReserved(var) || !var.matches("[a-zA-Z_]+[a-zA-Z0-9_]*"))
             throw new Exception("'" + var + "' is not a valid variable");
         variables.put(var, stackPointer -= size);
     }

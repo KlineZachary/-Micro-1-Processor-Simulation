@@ -1,0 +1,44 @@
+a=1;
+b=0;
+
+GT_GT=false;
+if;a>b;GT_GT = true;end;
+GT_LT=false;
+if;b>a;GT_LT = true;end;
+GT_E=false;
+if;a>a;GT_E = true;end;
+
+LT_GT=false;
+if;a<b;LT_GT = true;end;
+LT_LT=false;
+if;b<a;LT_LT = true;end;
+LT_E=false;
+if;a<a;LT_E = true;end;
+
+E_GT=false;
+if;a==b;E_GT = true;end;
+E_LT=false;
+if;b==a;E_LT = true;end;
+E_E=false;
+if;a==a;E_E = true;end;
+
+NE_GT=false;
+if;a!=b;NE_GT = true;end;
+NE_LT=false;
+if;b!=a;NE_LT = true;end;
+NE_E=false;
+if;a!=a;NE_E = true;end;
+
+LE_GT=false;
+if;a<=b;LE_GT = true;end;
+LE_LT=false;
+if;b<=a;LE_LT = true;end;
+LE_E=false;
+if;a<=a;LE_E = true;end;
+
+GE_GT=false;
+if;a>=b;GE_GT = true;end;
+GE_LT=false;
+if;b>=a;GE_LT = true;end;
+GE_E=false;
+if;a>=a;GE_E = true;end;

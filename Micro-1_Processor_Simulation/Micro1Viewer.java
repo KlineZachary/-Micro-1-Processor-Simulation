@@ -13,7 +13,9 @@ import java.io.*;
 public class Micro1Viewer {
 
     // Vars
-    static Console console = new Console(1024);
+    static Console console;
+    static Memory memory;
+    static Processor cpu;
     static int textAreas = 4;
 
     static String machineString = "";
@@ -36,6 +38,10 @@ public class Micro1Viewer {
 
     // Create frame and objects //Edited by zach
     public Micro1Viewer() {
+
+        console = new Console(1024);
+        cpu = console.getCPU();
+        memory = console.getMemory();
 
         int width = 1400, height = 840;
         JLabel title = new JLabel("Micro1 - Viewer", SwingConstants.CENTER);
@@ -161,7 +167,7 @@ public class Micro1Viewer {
                 label.setForeground(Color.white);
                 label.setBounds(x, y, 500, height);
                 f.add(label);
-                JTextField textField = new JTextField(Integer.toHexString(console.getCPU().getReg()[i]));
+                JTextField textField = new JTextField(String.format("%08x", cpu.read(i)));
                 textFieldList.add(textField);
                 textField.setEditable(false); // Registers are for display only
                 textField.setBounds(x + 75, y, width, height);
@@ -174,7 +180,7 @@ public class Micro1Viewer {
         // Zach ====================
         // Update register values on gui
         public static void updateRegisters() {
-            String[] regNumbers = console.getCPU().guiDump();
+            String[] regNumbers = cpu.guiDump();
             for (int i = 0; i < textFieldList.size(); i++) {
                 textFieldList.get(i).setText(regNumbers[i]);
             }
@@ -213,7 +219,7 @@ public class Micro1Viewer {
                         clear();
                         assemblyString = console
                                 .assemble(fc.getSelectedFile().getAbsolutePath().replaceAll("/\\.", ""));
-                        machineString = console.getMemory().dumpInstructions();
+                        machineString = memory.dumpInstructions();
                     }
                     break;
                 case 2: // Compiler
@@ -223,7 +229,7 @@ public class Micro1Viewer {
                         compileString = console.compile(path);
                         path = console.changeFileExtension(new File(path), ".asm");
                         assemblyString = console.assemble(path);
-                        machineString = console.getMemory().dumpInstructions();
+                        machineString = memory.dumpInstructions();
                     }
 
                     break;
@@ -258,9 +264,9 @@ public class Micro1Viewer {
 
                     break;
                 case 8: // RUN
-             
+
                     if (!machineString.isEmpty()) {
-            
+
                         console.step(Integer.MAX_VALUE);
                     } else {
                         JOptionPane.showMessageDialog(null, "No machine code to run", "Error",
@@ -305,7 +311,7 @@ public class Micro1Viewer {
         StringBuilder out = new StringBuilder();
 
         // New out without the lines that have been run
-        int PC = console.getCPU().getPC();
+        int PC = cpu.getPC();
         for (int i = PC; i < arr.length; i++) {
             if (!isAssembly
                     && ((i == 0 || (i > 0 && !arr[i - 1].matches("[0]*2[0-9a-fA-F]{2}"))) && arr[i].matches("[0]+"))) {
@@ -321,7 +327,6 @@ public class Micro1Viewer {
         return out.toString();
     }
 
-
     /**
      * Emptys all text areas with an empty strings Resets console Clears memory and
      * registers
@@ -331,8 +336,6 @@ public class Micro1Viewer {
         assemblyString = "";
         machineString = "";
         console.reset();
-        console.getCPU().clear();
-        console.getMemory().clear();
     }
 
     /**
@@ -341,15 +344,15 @@ public class Micro1Viewer {
      */
 
     public static void update() throws Exception {
-        String memory = "";
+        String memoryValues = "";
         for (int i = 0; i < 15; i++) {
-            memory += "\n";
+            memoryValues += "\n";
         }
-        memory = console.getMemory().dump() + memory;
+        memoryValues = memory.dump() + memory;
 
         String assembly = getLinesAfter(assemblyString, true);
         String machine = getLinesAfter(machineString, false);
-        String[] allStrings = { compileString, assembly, machine, memory };
+        String[] allStrings = { compileString, assembly, machine, memoryValues };
 
         // Update registers
         DisplayRegister.updateRegisters();
