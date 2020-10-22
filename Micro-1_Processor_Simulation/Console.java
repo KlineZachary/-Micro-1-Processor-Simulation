@@ -454,7 +454,7 @@ public class Console {
 	}
 
 	public static void main(String[] args) {
-		Console console = new Console(1024);
+		Console console = new Console(16);
 		console.controlLoop();
 	}
 
